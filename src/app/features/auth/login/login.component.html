@@ -1,0 +1,151 @@
+<div class="login-page">
+  <div class="login-container">
+    <!-- Logo et titre -->
+    <div class="login-header">
+      <div class="logo">
+        <h1 class="title is-2 has-text-primary">Le Parrain</h1>
+        <p class="subtitle is-5 has-text-grey">Système de gestion bar & restaurant</p>
+      </div>
+    </div>
+
+    <!-- Formulaire de connexion -->
+    <div class="login-form-card">
+      <div class="card">
+        <div class="card-header">
+          <p class="card-header-title">
+            <span class="icon mr-2">
+              <span class="emoji">🔐</span>
+            </span>
+            Connexion
+          </p>
+        </div>
+        
+        <div class="card-content">
+          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+            <!-- Champ téléphone -->
+            <div class="field">
+              <label class="label">Numéro de téléphone</label>
+              <div class="control has-icons-left" [class.has-icons-right]="isPhoneInvalid">
+                <input 
+                  class="input"
+                  [class.is-danger]="isPhoneInvalid"
+                  type="tel"
+                  placeholder="237XXXXXXXXX"
+                  formControlName="phone"
+                  autocomplete="tel"
+                >
+                <span class="icon is-small is-left">
+                  <span class="emoji">📱</span>
+                </span>
+                @if (isPhoneInvalid) {
+                  <span class="icon is-small is-right">
+                    <span class="emoji">⚠️</span>
+                  </span>
+                }
+              </div>
+              @if (isPhoneInvalid) {
+                <p class="help is-danger">{{ phoneErrorMessage }}</p>
+              }
+            </div>
+
+            <!-- Champ mot de passe -->
+            <div class="field">
+              <label class="label">Mot de passe</label>
+              <div class="control has-icons-left has-icons-right">
+                <input 
+                  class="input"
+                  [class.is-danger]="isPasswordInvalid"
+                  [type]="showPassword ? 'text' : 'password'"
+                  placeholder="Mot de passe"
+                  formControlName="password"
+                  autocomplete="current-password"
+                >
+                <span class="icon is-small is-left">
+                  <span class="emoji">🔑</span>
+                </span>
+                <span 
+                  class="icon is-small is-right password-toggle"
+                  (click)="togglePasswordVisibility()"
+                >
+                  <span class="emoji">{{ showPassword ? '🙈' : '👁️' }}</span>
+                </span>
+              </div>
+              @if (isPasswordInvalid) {
+                <p class="help is-danger">{{ passwordErrorMessage }}</p>
+              }
+            </div>
+
+            <!-- Message d'erreur global -->
+            @if (errorMessage) {
+              <div class="notification is-danger is-light">
+                <span class="icon">
+                  <span class="emoji">❌</span>
+                </span>
+                {{ errorMessage }}
+              </div>
+            }
+
+            <!-- Bouton de connexion -->
+            <div class="field">
+              <div class="control">
+                <button 
+                  class="button is-primary is-large is-fullwidth"
+                  type="submit"
+                  [disabled]="!loginForm.valid || isLoading"
+                  [class.is-loading]="isLoading"
+                >
+                  @if (!isLoading) {
+                    <span class="icon">
+                      <span class="emoji">🚀</span>
+                    </span>
+                    <span>Se connecter</span>
+                  }
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comptes de test -->
+    <div class="test-accounts">
+      <div class="notification is-info is-light">
+        <h4 class="title is-6 mb-3">
+          <span class="icon mr-2">
+            <span class="emoji">🧪</span>
+          </span>
+          Comptes de Test
+        </h4>
+        <div class="test-accounts-grid">
+          @for (account of testAccounts; track account.role) {
+            <div class="test-account-card" (click)="useTestAccount(account)">
+              <div class="account-role">{{ account.role }}</div>
+              <div class="account-details">
+                <div class="account-phone">📱 {{ account.phone }}</div>
+                <div class="account-password">🔑 {{ account.password }}</div>
+              </div>
+              <div class="account-action">
+                <span class="tag is-success is-small">Cliquez pour utiliser</span>
+              </div>
+            </div>
+          }
+        </div>
+        <p class="help has-text-info mt-3">
+          <span class="icon">
+            <span class="emoji">💡</span>
+          </span>
+          Cliquez sur un compte pour remplir automatiquement le formulaire
+        </p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="login-footer">
+      <p class="has-text-grey">
+        <span class="emoji">🏢</span>
+        Le Parrain © 2025 - Gestion Bar & Restaurant
+      </p>
+    </div>
+  </div>
+</div>

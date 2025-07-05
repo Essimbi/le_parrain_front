@@ -1,0 +1,124 @@
+<div class="orders-cash-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1 class="title is-3 has-text-primary">Commandes & Caisse</h1>
+    <p class="subtitle is-6 has-text-grey">Gérez les commandes reçues et votre caisse</p>
+  </div>
+
+  <!-- Cash Metrics -->
+  <div class="columns is-multiline mb-6">
+    <div class="column is-3">
+      <div class="card metric-card">
+        <div class="card-content">
+          <p class="heading">Caisse du jour</p>
+          <p class="title is-4 has-text-primary">{{ cashMetrics.dailyTotal | number:'1.0-0' }} FCFA</p>
+          <p class="subtitle is-7 has-text-success">+5,200 depuis ce matin</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="column is-3">
+      <div class="card metric-card">
+        <div class="card-content">
+          <p class="heading">Commandes servies</p>
+          <p class="title is-4 has-text-info">{{ cashMetrics.ordersServed }}</p>
+          <p class="subtitle is-7 has-text-warning">{{ cashMetrics.pendingOrders }} en attente</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="column is-3">
+      <div class="card metric-card">
+        <div class="card-content">
+          <p class="heading">Paiements Cash</p>
+          <p class="title is-4 has-text-success">{{ cashMetrics.cashPayments | number:'1.0-0' }} FCFA</p>
+          <p class="subtitle is-7">{{ getCashPercentage() }}% du total</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="column is-3">
+      <div class="card metric-card">
+        <div class="card-content">
+          <p class="heading">Mobile Money</p>
+          <p class="title is-4 has-text-link">{{ cashMetrics.mobileMoneyPayments | number:'1.0-0' }} FCFA</p>
+          <p class="subtitle is-7">{{ getMobileMoneyPercentage() }}% du total</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Orders Management -->
+  <div class="columns">
+    <!-- New Orders -->
+    <div class="column is-6">
+      <div class="card orders-section">
+        <div class="card-header has-background-danger">
+          <p class="card-header-title has-text-white">
+            🔥 Nouvelles Commandes ({{ newOrders.length }})
+          </p>
+        </div>
+        <div class="card-content p-0">
+          <div class="orders-container">
+            @for (order of newOrders; track order.id) {
+              <app-order-card
+                [order]="order"
+                [timeAgo]="getTimeAgo(order.createdAt)"
+                [isPreparingMode]="false"
+                (onPrepare)="onPrepareOrder($event)"
+                (onViewDetails)="onViewDetails($event)"
+              ></app-order-card>
+            } @empty {
+              <div class="empty-state">
+                <span class="icon is-large has-text-grey-light">
+                  <span class="emoji large">☕</span>
+                </span>
+                <p class="has-text-grey mt-3">Aucune nouvelle commande</p>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Orders in Progress -->
+    <div class="column is-6">
+      <div class="card orders-section">
+        <div class="card-header has-background-warning">
+          <p class="card-header-title has-text-white">
+            ⏳ En Préparation ({{ preparingOrders.length }})
+          </p>
+        </div>
+        <div class="card-content p-0">
+          <div class="orders-container">
+            @for (order of preparingOrders; track order.id) {
+              <app-order-card
+                [order]="order"
+                [timeAgo]="getTimeAgo(order.createdAt)"
+                [isPreparingMode]="true"
+                (onFinish)="onFinishOrder($event)"
+                (onProcessPayment)="onProcessPayment($event)"
+              ></app-order-card>
+            } @empty {
+              <div class="empty-state">
+                <span class="icon is-large has-text-grey-light">
+                  <span class="emoji large">✅</span>
+                </span>
+                <p class="has-text-grey mt-3">Aucune commande en préparation</p>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Modal -->
+  @if (showPaymentModal) {
+    <app-payment-modal
+      [order]="selectedOrderForPayment"
+      (onPaymentComplete)="onPaymentComplete($event)"
+      (onClose)="closePaymentModal()"
+    ></app-payment-modal>
+  }
+</div>

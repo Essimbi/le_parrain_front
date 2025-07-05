@@ -1,0 +1,142 @@
+.category-card {
+  background: white;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+  }
+}
+
+.category-header {
+  padding: 20px 25px;
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  &.whisky-header {
+    background: linear-gradient(135deg, #d4a574, #b8956a);
+  }
+
+  &.champagne-header {
+    background: linear-gradient(135deg, #f1c40f, #f39c12);
+  }
+
+  &.spiritueux-header {
+    background: linear-gradient(135deg, #8e44ad, #9b59b6);
+  }
+
+  &.cigares-header {
+    background: linear-gradient(135deg, #34495e, #2c3e50);
+  }
+}
+
+.category-icon {
+  font-size: 1.5rem;
+}
+
+.category-name {
+  flex: 1;
+}
+
+.products-list {
+  padding: 0;
+}
+
+.product-item {
+  padding: 15px 25px;
+  border-bottom: 1px solid #ecf0f1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.3s ease;
+
+  &:hover {
+    background: #f8f9fa;
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.product-info {
+  flex: 1;
+}
+
+.product-name {
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+.product-price {
+  color: #7f8c8d;
+  font-size: 13px;
+}
+
+.stock-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.stock-quantity {
+  padding: 8px 15px;
+  border-radius: 20px;
+  font-weight: 600;
+  min-width: 60px;
+  text-align: center;
+  font-size: 14px;
+
+  &.stock-low {
+    background: #fadbd8;
+    color: #c0392b;
+  }
+
+  &.stock-ok {
+    background: #d5f4e6;
+    color: #27ae60;
+  }
+}
+
+.stock-btn {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  font-weight: bold;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+
+  &:hover:not(:disabled) {
+    transform: scale(1.1);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .product-item {
+    padding: 12px 15px;
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+
+  .stock-controls {
+    justify-content: center;
+  }
+}

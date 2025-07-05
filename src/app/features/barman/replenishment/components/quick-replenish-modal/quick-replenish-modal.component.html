@@ -1,0 +1,177 @@
+<div class="modal is-active" (keydown)="onKeyDown($event)">
+  <div class="modal-background" (click)="closeModal()"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">
+        <span class="icon mr-2">
+          <span class="emoji">⚡</span>
+        </span>
+        Demande Rapide - Produits Critiques
+      </p>
+      <button class="delete" aria-label="close" (click)="closeModal()"></button>
+    </header>
+    
+    <section class="modal-card-body">
+      <!-- Info -->
+      <div class="notification is-warning is-light mb-5">
+        <span class="icon">
+          <span class="emoji">💡</span>
+        </span>
+        <strong>Demande rapide :</strong> Cochez les produits que vous souhaitez réapprovisionner en urgence.
+        Les quantités suggérées sont calculées automatiquement.
+      </div>
+
+      <!-- Summary -->
+      <div class="summary-bar mb-5">
+        <div class="level">
+          <div class="level-left">
+            <div class="level-item">
+              <span class="tag is-info is-medium">
+                {{ totalSelectedProducts }} produits sélectionnés
+              </span>
+            </div>
+            <div class="level-item">
+              <span class="tag is-primary is-medium">
+                {{ totalSelectedItems }} unités au total
+              </span>
+            </div>
+          </div>
+          <div class="level-right">
+            <div class="level-item">
+              <button 
+                class="button is-small is-outlined" 
+                (click)="toggleSelectAll()"
+              >
+                <span class="icon">
+                  <span class="emoji">☑️</span>
+                </span>
+                <span>Tout sélectionner</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Products List -->
+      <div class="products-list">
+        @for (item of quickItems; track item.productId) {
+          <div class="product-row" [class.is-selected]="item.selected">
+            <div class="product-selection">
+              <label class="checkbox">
+                <input 
+                  type="checkbox" 
+                  [(ngModel)]="item.selected"
+                  (change)="onItemSelectionChange(item)"
+                >
+                <span class="checkmark"></span>
+              </label>
+            </div>
+
+            <div class="product-info">
+              <div class="product-header">
+                <div class="product-name">{{ item.productName }}</div>
+                <div class="product-criticality">
+                  <span class="tag" [ngClass]="getCriticalityClass(item.currentStock)">
+                    {{ getCriticalityText(item.currentStock) }}
+                  </span>
+                </div>
+              </div>
+              <div class="product-details">
+                <span class="detail-item">
+                  <span class="emoji">📦</span>
+                  Stock: {{ item.currentStock }}
+                </span>
+                <span class="detail-item">
+                  <span class="emoji">🏷️</span>
+                  {{ item.category }}
+                </span>
+              </div>
+            </div>
+
+            <div class="quantity-controls">
+              <div class="suggested-info">
+                <span class="suggested-label">Suggéré: {{ item.suggestedQuantity }}</span>
+                <button 
+                  class="button is-text is-small"
+                  (click)="resetToSuggested(item)"
+                  title="Utiliser la quantité suggérée"
+                >
+                  <span class="emoji">🎯</span>
+                </button>
+              </div>
+              
+              <div class="quantity-input">
+                <button 
+                  class="button is-small is-outlined"
+                  (click)="decreaseQuantity(item)"
+                  [disabled]="item.quantity <= 1"
+                >
+                  -
+                </button>
+  
+                <input 
+                  class="input is-small quantity-field" 
+                  type="number" 
+                  [(ngModel)]="item.quantity"
+                  (ngModelChange)="onQuantityChange(item)"
+                  min="1"
+                  max="100"
+                >
+  
+                <button 
+                  class="button is-small is-outlined"
+                  (click)="increaseQuantity(item)"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+          </div>
+        } @empty {
+          <div class="empty-state">
+            <span class="icon is-large has-text-grey-light">
+              <span class="emoji large">✅</span>
+            </span>
+            <p class="has-text-grey mt-3">Aucun produit en stock critique</p>
+          </div>
+        }
+      </div>
+
+      <!-- Comment -->
+      <div class="comment-section mt-5">
+        <div class="field">
+          <label class="label">Commentaire</label>
+          <div class="control">
+            <textarea 
+              class="textarea" 
+              [(ngModel)]="comment"
+              placeholder="Commentaire pour cette demande urgente..."
+              rows="2"
+            ></textarea>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <footer class="modal-card-foot">
+      <div class="buttons is-right">
+        <button class="button" (click)="closeModal()">
+          <span class="icon">
+            <span class="emoji">❌</span>
+          </span>
+          <span>Annuler</span>
+        </button>
+        <button 
+          class="button is-success is-medium" 
+          (click)="submitQuickReplenishment()"
+          [disabled]="!canSubmit"
+        >
+          <span class="icon">
+            <span class="emoji">🚀</span>
+          </span>
+          <span>Envoyer Demande Urgente ({{ totalSelectedItems }} articles)</span>
+        </button>
+      </div>
+    </footer>
+  </div>
+</div>

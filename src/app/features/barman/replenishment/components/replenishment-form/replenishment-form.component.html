@@ -1,0 +1,218 @@
+<div class="replenishment-form">
+  <h3 class="title is-4 mb-5">
+    <span class="icon mr-2">
+      <span class="emoji">📝</span>
+    </span>
+    Nouvelle Demande de Réapprovisionnement
+  </h3>
+
+  <!-- Product Selection Form -->
+  <div class="product-selection mb-5">
+    <div class="columns">
+      <div class="column is-4">
+        <div class="field">
+          <label class="label">Catégorie</label>
+          <div class="control">
+            <div class="select is-fullwidth">
+              <select [(ngModel)]="selectedCategory">
+                <option value="">Toutes les catégories</option>
+                @for (category of categories; track category.id) {
+                  <option [value]="category.id">{{ category.name }}</option>
+                }
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="column is-4">
+        <div class="field">
+          <label class="label">Produit</label>
+          <div class="control">
+            <div class="select is-fullwidth">
+              <select [(ngModel)]="selectedProductId">
+                <option value="">Sélectionner un produit</option>
+                @for (product of filteredProducts; track product.id) {
+                  <option [value]="product.id">
+                    {{ product.name }} (Stock: {{ product.currentStock }})
+                  </option>
+                }
+              </select>
+            </div>
+          </div>
+          @if (selectedProduct) {
+            <p class="help">
+              Stock actuel: {{ selectedProduct.currentStock }} | 
+              Minimum: {{ selectedProduct.minStock }}
+              @if (selectedProduct.currentStock <= selectedProduct.minStock) {
+                <span class="has-text-danger"> - ⚠️ Stock critique</span>
+              }
+            </p>
+          }
+        </div>
+      </div>
+
+      <div class="column is-2">
+        <div class="field">
+          <label class="label">Quantité</label>
+          <div class="control">
+            <input 
+              class="input" 
+              type="number" 
+              [(ngModel)]="requestedQuantity"
+              min="1"
+              max="100"
+            >
+          </div>
+          @if (selectedProduct) {
+            <p class="help is-info">
+              <button 
+                class="button is-text is-small p-0" 
+                (click)="useSuggestedQuantity()"
+              >
+                Suggéré: {{ getSuggestedQuantity(selectedProduct) }}
+              </button>
+            </p>
+          }
+        </div>
+      </div>
+
+      <div class="column is-2">
+        <div class="field">
+          <label class="label">&nbsp;</label>
+          <div class="control">
+            <button 
+              class="button is-primary is-fullwidth" 
+              (click)="addToRequest()"
+              [disabled]="!canAddToRequest"
+            >
+              <span class="icon">
+                <span class="emoji">➕</span>
+              </span>
+              <span>Ajouter</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Current Request Items -->
+  @if (currentRequestItems.length > 0) {
+    <div class="current-request mb-5">
+      <h4 class="title is-5 mb-4">
+        <span class="icon mr-2">
+          <span class="emoji">🛒</span>
+        </span>
+        Demande en Cours ({{ totalRequestItems }} articles)
+      </h4>
+      
+      <div class="request-items">
+        @for (item of currentRequestItems; track $index) {
+          <div class="request-item">
+            <div class="item-info">
+              <div class="item-name">{{ item.productName }}</div>
+              <div class="item-details">
+                {{ item.category }} | Stock actuel: {{ item.currentStock }}
+              </div>
+            </div>
+            <div class="item-quantity">
+              <span class="tag is-primary is-medium">{{ item.requestedQuantity }} unités</span>
+            </div>
+            <div class="item-actions">
+              <button 
+                class="button is-danger is-small" 
+                (click)="removeFromRequest($index)"
+              >
+                <span class="icon">
+                  <span class="emoji">🗑️</span>
+                </span>
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Request Settings -->
+  <div class="request-settings mb-5">
+    <div class="columns">
+      <div class="column is-6">
+        <div class="field">
+          <label class="label">Priorité</label>
+          <div class="control">
+            <div class="priority-options">
+              <label class="radio-option" [class.is-selected]="priority === 'normal'">
+                <input 
+                  type="radio" 
+                  name="priority" 
+                  value="normal" 
+                  [(ngModel)]="priority"
+                >
+                <div class="option-content">
+                  <span class="emoji">📋</span>
+                  <span>Normale</span>
+                </div>
+              </label>
+              
+              <label class="radio-option" [class.is-selected]="priority === 'urgent'">
+                <input 
+                  type="radio" 
+                  name="priority" 
+                  value="urgent" 
+                  [(ngModel)]="priority"
+                >
+                <div class="option-content">
+                  <span class="emoji">⚡</span>
+                  <span>Urgente</span>
+                </div>
+              </label>
+              
+              <label class="radio-option" [class.is-selected]="priority === 'critical'">
+                <input 
+                  type="radio" 
+                  name="priority" 
+                  value="critical" 
+                  [(ngModel)]="priority"
+                >
+                <div class="option-content">
+                  <span class="emoji">🚨</span>
+                  <span>Critique</span>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="column is-6">
+        <div class="field">
+          <label class="label">Commentaire</label>
+          <div class="control">
+            <textarea 
+              class="textarea" 
+              [(ngModel)]="comment"
+              placeholder="Précisez la raison de cette demande..."
+              rows="3"
+            ></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Submit Button -->
+  <div class="form-actions">
+    <button 
+      class="button is-success is-large" 
+      (click)="submitRequest()"
+      [disabled]="currentRequestItems.length === 0"
+    >
+      <span class="icon">
+        <span class="emoji">📤</span>
+      </span>
+      <span>Envoyer la Demande ({{ totalRequestItems }} articles)</span>
+    </button>
+  </div>
+</div>

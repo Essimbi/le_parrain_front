@@ -1,0 +1,284 @@
+.modal {
+  z-index: 1000;
+}
+
+.modal-card {
+  width: 90%;
+  max-width: 600px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+}
+
+.modal-card-head {
+  background: linear-gradient(135deg, #27ae60, #2ecc71);
+  color: white;
+  padding: 1.5rem;
+
+  .modal-card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+
+    .emoji {
+      font-size: 1.5rem;
+    }
+  }
+
+  .delete {
+    background: rgba(255,255,255,0.2);
+    
+    &:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
+    &::before, &::after {
+      background-color: white;
+    }
+  }
+}
+
+.modal-card-body {
+  padding: 2rem;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+// Order Summary
+.order-summary {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.order-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  
+  .label {
+    color: #7f8c8d;
+    font-weight: 500;
+  }
+  
+  .value {
+    font-weight: 600;
+    color: #2c3e50;
+  }
+}
+
+.items-list {
+  margin-bottom: 1rem;
+}
+
+.item-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #ecf0f1;
+  
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .item-name {
+    color: #2c3e50;
+  }
+
+  .item-price {
+    font-weight: 600;
+    color: #27ae60;
+  }
+}
+
+.total-section {
+  border-top: 2px solid #e74c3c;
+  padding-top: 1rem;
+}
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .total-label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2c3e50;
+  }
+
+  .total-amount {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #e74c3c;
+  }
+}
+
+// Payment Form
+.payment-form {
+  .title {
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+  }
+}
+
+.payment-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.radio-card {
+  border: 2px solid #ecf0f1;
+  border-radius: 12px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: block;
+  text-align: center;
+
+  &:hover {
+    border-color: #3498db;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  }
+
+  &.is-selected {
+    border-color: #27ae60;
+    background: #d4edda;
+    box-shadow: 0 5px 15px rgba(39,174,96,0.2);
+  }
+
+  input {
+    display: none;
+  }
+
+  .radio-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .emoji.large {
+    font-size: 2rem;
+  }
+
+  .radio-text {
+    font-weight: 600;
+    color: #2c3e50;
+  }
+}
+
+// Cash Details
+.cash-details {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+
+  .input {
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-align: center;
+
+    &[readonly] {
+      background: #ecf0f1;
+    }
+  }
+
+  .help {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    font-weight: 500;
+  }
+}
+
+// Mobile Money Details
+.mobile-money-details {
+  margin-top: 1.5rem;
+
+  .notification {
+    border-radius: 8px;
+    padding: 1.5rem;
+
+    .icon {
+      margin-right: 0.5rem;
+    }
+  }
+}
+
+// Footer
+.modal-card-foot {
+  background: #f8f9fa;
+  padding: 1.5rem 2rem;
+  border-top: 1px solid #ecf0f1;
+
+  .buttons {
+    margin: 0;
+    width: 100%;
+    justify-content: flex-end;
+    gap: 1rem;
+  }
+
+  .button {
+    border-radius: 8px;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+
+    &.is-large {
+      font-size: 1.1rem;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .emoji {
+      font-size: 1.1rem;
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .modal-card {
+    width: 95%;
+    margin: 10px;
+  }
+
+  .modal-card-body {
+    padding: 1rem;
+  }
+
+  .order-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .payment-options {
+    grid-template-columns: 1fr;
+  }
+
+  .cash-details .columns {
+    display: block;
+  }
+
+  .modal-card-foot {
+    padding: 1rem;
+
+    .buttons {
+      flex-direction: column;
+    }
+  }
+}

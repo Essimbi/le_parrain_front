@@ -1,0 +1,104 @@
+<div class="stock-bar-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1 class="title is-3 has-text-primary">Stock Bar</h1>
+    <p class="subtitle is-6 has-text-grey">Gérez vos stocks par catégorie</p>
+  </div>
+
+  <!-- Stock Overview -->
+  <div class="columns is-multiline mb-6">
+    <div class="column is-3">
+      <div class="card metric-card">
+        <div class="card-content">
+          <div class="level">
+            <div class="level-left">
+              <div>
+                <p class="heading">Produits Bar</p>
+                <p class="title is-4 has-text-info">{{ stockMetrics.totalProducts }}</p>
+                <p class="subtitle is-7">{{ stockMetrics.categories }} catégories</p>
+              </div>
+            </div>
+            <div class="level-right">
+              <span class="icon is-large has-text-info">
+                <span class="emoji">📦</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="column is-3">
+      <div class="card metric-card critical">
+        <div class="card-content">
+          <div class="level">
+            <div class="level-left">
+              <div>
+                <p class="heading">Stock Critique</p>
+                <p class="title is-4 has-text-danger">{{ stockMetrics.criticalStock }}</p>
+                <p class="subtitle is-7 has-text-danger">À réapprovisionner</p>
+              </div>
+            </div>
+            <div class="level-right">
+              <span class="icon is-large has-text-danger">
+                <span class="emoji">⚠️</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="column is-3">
+      <div class="card metric-card">
+        <div class="card-content">
+          <div class="level">
+            <div class="level-left">
+              <div>
+                <p class="heading">Valeur Stock</p>
+                <p class="title is-4 has-text-success">{{ stockMetrics.stockValue | number:'1.0-0' }} FCFA</p>
+                <p class="subtitle is-7 has-text-success">+12,000 cette semaine</p>
+              </div>
+            </div>
+            <div class="level-right">
+              <span class="icon is-large has-text-success">
+                <span class="emoji">💎</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="column is-3">
+      <div class="card metric-card">
+        <div class="card-content">
+          <div class="level">
+            <div class="level-left">
+              <div>
+                <p class="heading">Dernière MAJ</p>
+                <p class="title is-6 has-text-grey">Aujourd'hui</p>
+                <p class="subtitle is-7">{{ getCurrentTime() }}</p>
+              </div>
+            </div>
+            <div class="level-right">
+              <span class="icon is-large has-text-grey">
+                <span class="emoji">🕒</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stock Categories -->
+  <div class="stock-categories">
+    @for (category of categories; track category.id) {
+      <app-category-card
+        [category]="category"
+        (onStockAdjustment)="onStockAdjustment($event.productId, $event.change)"
+      ></app-category-card>
+    }
+  </div>
+</div>

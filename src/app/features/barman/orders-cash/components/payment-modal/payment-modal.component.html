@@ -1,0 +1,187 @@
+<div class="modal is-active" (keydown)="onKeyDown($event)">
+  <div class="modal-background" (click)="closeModal()"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">
+        <span class="icon mr-2">
+          <span class="emoji">💰</span>
+        </span>
+        Encaissement - {{ order?.number }}
+      </p>
+      <button class="delete" aria-label="close" (click)="closeModal()"></button>
+    </header>
+    
+    <section class="modal-card-body">
+      <!-- Order Details -->
+      <div class="order-summary">
+        <h4 class="title is-5 mb-4">Détails de la commande</h4>
+        <div class="order-info-grid">
+          <div class="info-item">
+            <span class="label">Serveur:</span>
+            <span class="value">{{ order?.serveurName }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Table:</span>
+            <span class="value">{{ order?.tableNumber }}</span>
+          </div>
+        </div>
+        
+        <div class="items-list">
+          <h5 class="subtitle is-6 mb-3">Articles commandés:</h5>
+          @if (order && order.items) {
+            @for (item of order.items; track $index) {
+              <div class="item-row">
+                <span class="item-name">{{ item.quantity }}x {{ item.productName }}</span>
+                <span class="item-price">{{ (item.quantity * item.unitPrice) | number:'1.0-0' }} FCFA</span>
+              </div>
+            }
+          } @else {
+            <p class="has-text-grey">Aucun article</p>
+          }
+        </div>
+        
+        <div class="total-section">
+          <div class="total-row">
+            <span class="total-label">Total à payer:</span>
+            <span class="total-amount">{{ order?.totalAmount | number:'1.0-0' }} FCFA</span>
+          </div>
+        </div>
+      </div>
+
+      <hr>
+
+      <!-- Payment Form -->
+      <div class="payment-form">
+        <h4 class="title is-5 mb-4">Mode de paiement</h4>
+        
+        <div class="field">
+          <div class="control">
+            <div class="payment-options">
+              <label class="radio-card" [class.is-selected]="paymentType === 'cash'">
+                <input 
+                  type="radio" 
+                  name="paymentType" 
+                  value="cash" 
+                  [(ngModel)]="paymentType"
+                  (change)="onPaymentTypeChange()"
+                >
+                <div class="radio-content">
+                  <span class="icon is-large">
+                    <span class="emoji large">💵</span>
+                  </span>
+                  <span class="radio-text">Espèces</span>
+                </div>
+              </label>
+              
+              <label class="radio-card" [class.is-selected]="paymentType === 'mobile_money'">
+                <input 
+                  type="radio" 
+                  name="paymentType" 
+                  value="mobile_money" 
+                  [(ngModel)]="paymentType"
+                  (change)="onPaymentTypeChange()"
+                >
+                <div class="radio-content">
+                  <span class="icon is-large">
+                    <span class="emoji large">📱</span>
+                  </span>
+                  <span class="radio-text">Mobile Money</span>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cash Payment Details -->
+        @if (paymentType === 'cash') {
+          <div class="cash-details">
+            <div class="columns">
+              <div class="column">
+                <div class="field">
+                  <label class="label">Montant reçu (FCFA)</label>
+                  <div class="control">
+                    <input 
+                      class="input is-large" 
+                      type="number" 
+                      [(ngModel)]="amountReceived"
+                      (ngModelChange)="onAmountReceivedChange()"
+                      [placeholder]="order?.totalAmount?.toString() || '0'"
+                      min="0"
+                    >
+                  </div>
+                </div>
+              </div>
+              
+              <div class="column">
+                <div class="field">
+                  <label class="label">Monnaie à rendre</label>
+                  <div class="control">
+                    <input 
+                      class="input is-large" 
+                      type="number" 
+                      [value]="changeAmount | number:'1.0-0'"
+                      readonly
+                      [class.has-text-success]="changeAmount >= 0"
+                      [class.has-text-danger]="changeAmount < 0"
+                    >
+                  </div>
+                  @if (changeAmount > 0) {
+                    <p class="help has-text-success">
+                      <span class="icon">
+                        <span class="emoji">💚</span>
+                      </span>
+                      Rendu: {{ changeAmount | number:'1.0-0' }} FCFA
+                    </p>
+                  }
+                  @if (amountReceived < (order?.totalAmount || 0)) {
+                    <p class="help has-text-danger">
+                      <span class="icon">
+                        <span class="emoji">⚠️</span>
+                      </span>
+                      Montant insuffisant
+                    </p>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Mobile Money Details -->
+        @if (paymentType === 'mobile_money') {
+          <div class="mobile-money-details">
+            <div class="notification is-info is-light">
+              <span class="icon">
+                <span class="emoji">ℹ️</span>
+              </span>
+              <strong>Paiement Mobile Money</strong><br>
+              Montant exact: {{ order?.totalAmount | number:'1.0-0' }} FCFA<br>
+              Vérifiez la réception du paiement avant de confirmer.
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+    
+    <footer class="modal-card-foot">
+      <div class="buttons is-right">
+        <button class="button" (click)="closeModal()">
+          <span class="icon">
+            <span class="emoji">❌</span>
+          </span>
+          <span>Annuler</span>
+        </button>
+        <button 
+          class="button is-success is-large" 
+          (click)="confirmPayment()"
+          [disabled]="paymentType === 'cash' && amountReceived < (order?.totalAmount || 0)"
+        >
+          <span class="icon">
+            <span class="emoji">✅</span>
+          </span>
+          <span>Confirmer Paiement</span>
+        </button>
+      </div>
+    </footer>
+  </div>
+</div>

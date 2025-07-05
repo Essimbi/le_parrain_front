@@ -1,0 +1,293 @@
+<div class="replenishment-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1 class="title is-3 has-text-primary">Réapprovisionnement</h1>
+    <p class="subtitle is-6 has-text-grey">Créez et suivez vos demandes de réappro</p>
+  </div>
+
+  <!-- Metrics Overview -->
+  <div class="columns is-multiline mb-6">
+    <div class="column is-3">
+      <div class="card metric-card">
+        <div class="card-content">
+          <div class="level">
+            <div class="level-left">
+              <div>
+                <p class="heading">Demandes en Attente</p>
+                <p class="title is-4 has-text-warning">{{ metrics.pendingRequests }}</p>
+                <p class="subtitle is-7">En cours de validation</p>
+              </div>
+            </div>
+            <div class="level-right">
+              <span class="icon is-large has-text-warning">
+                <span class="emoji">⏳</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="column is-3">
+      <div class="card metric-card">
+        <div class="card-content">
+          <div class="level">
+            <div class="level-left">
+              <div>
+                <p class="heading">Dernière Livraison</p>
+                <p class="title is-5 has-text-success">{{ metrics.lastDelivery }}</p>
+                <p class="subtitle is-7 has-text-success">15 produits reçus</p>
+              </div>
+            </div>
+            <div class="level-right">
+              <span class="icon is-large has-text-success">
+                <span class="emoji">📦</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="column is-3">
+      <div class="card metric-card critical">
+        <div class="card-content">
+          <div class="level">
+            <div class="level-left">
+              <div>
+                <p class="heading">Produits Urgents</p>
+                <p class="title is-4 has-text-danger">{{ metrics.urgentProducts }}</p>
+                <p class="subtitle is-7 has-text-danger">Stock < 5</p>
+              </div>
+            </div>
+            <div class="level-right">
+              <span class="icon is-large has-text-danger">
+                <span class="emoji">🚨</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="column is-3">
+      <div class="card metric-card">
+        <div class="card-content">
+          <div class="level">
+            <div class="level-left">
+              <div>
+                <p class="heading">Prochaine Livraison</p>
+                <p class="title is-5 has-text-info">{{ metrics.nextDelivery || 'À définir' }}</p>
+                <p class="subtitle is-7">Prévisionnel</p>
+              </div>
+            </div>
+            <div class="level-right">
+              <span class="icon is-large has-text-info">
+                <span class="emoji">🚛</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="action-buttons mb-6">
+    <button class="button is-primary is-medium" (click)="openQuickReplenishModal()">
+      <span class="icon">
+        <span class="emoji">⚡</span>
+      </span>
+      <span>Demande Rapide</span>
+    </button>
+    
+    <button class="button is-info is-medium" (click)="openNewProductModal()">
+      <span class="icon">
+        <span class="emoji">➕</span>
+      </span>
+      <span>Nouveau Produit</span>
+    </button>
+  </div>
+
+  <!-- New Replenishment Form -->
+  <div class="form-section mb-6">
+    <app-replenishment-form
+      [urgentProducts]="urgentProducts"
+      (onRequestSubmit)="onNewReplenishmentRequest($event)"
+    ></app-replenishment-form>
+  </div>
+
+  <!-- Requests History -->
+  <div class="requests-history">
+    <div class="card">
+      <div class="card-header">
+        <p class="card-header-title">
+          <span class="icon mr-2">
+            <span class="emoji">📋</span>
+          </span>
+          Historique des Demandes
+        </p>
+      </div>
+      <div class="card-content p-0">
+        <div class="table-container">
+          <table class="table is-fullwidth is-hoverable">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Produits</th>
+                <th>Quantité Total</th>
+                <th>Priorité</th>
+                <th>Statut</th>
+                <th>Validé le</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (request of requests; track request.id) {
+                <tr>
+                  <td>
+                    <span class="has-text-weight-semibold">{{ formatDate(request.date) }}</span>
+                  </td>
+                  <td>
+                    <span class="tag is-light">{{ request.products.length }} articles</span>
+                  </td>
+                  <td>
+                    <span class="has-text-weight-semibold">{{ request.totalQuantity }} unités</span>
+                  </td>
+                  <td>
+                    <span class="tag" [ngClass]="getPriorityClass(request.priority)">
+                      {{ getPriorityText(request.priority) }}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="tag" [ngClass]="getStatusClass(request.status)">
+                      {{ getStatusText(request.status) }}
+                    </span>
+                  </td>
+                  <td>
+                    @if (request.approvedAt) {
+                      <span class="has-text-success">{{ formatDate(request.approvedAt) }}</span>
+                    } @else {
+                      <span class="has-text-grey">-</span>
+                    }
+                  </td>
+                  <td>
+                    <div class="buttons are-small">
+                      <button 
+                        class="button is-info is-small" 
+                        (click)="viewRequestDetails(request.id)"
+                      >
+                        <span class="icon">
+                          <span class="emoji">👁️</span>
+                        </span>
+                      </button>
+                      
+                      @if (request.status === 'pending') {
+                        <button 
+                          class="button is-warning is-small" 
+                          (click)="editRequest(request.id)"
+                        >
+                          <span class="icon">
+                            <span class="emoji">✏️</span>
+                          </span>
+                        </button>
+                        
+                        <button 
+                          class="button is-danger is-small" 
+                          (click)="cancelRequest(request.id)"
+                        >
+                          <span class="icon">
+                            <span class="emoji">❌</span>
+                          </span>
+                        </button>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="7" class="has-text-centered has-text-grey p-6">
+                    <span class="icon is-large">
+                      <span class="emoji large">📝</span>
+                    </span>
+                    <p class="mt-3">Aucune demande de réapprovisionnement</p>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Replenish Modal -->
+  @if (showQuickReplenishModal) {
+    <app-quick-replenish-modal
+      [urgentProducts]="urgentProducts"
+      (onSubmit)="onQuickReplenishment($event)"
+      (onClose)="closeQuickReplenishModal()"
+    ></app-quick-replenish-modal>
+  }
+
+  <!-- New Product Request Modal -->
+  @if (showNewProductModal) {
+    <div class="modal is-active">
+      <div class="modal-background" (click)="closeNewProductModal()"></div>
+      <div class="modal-card">
+        <header class="modal-card-head">
+          <p class="modal-card-title">
+            <span class="icon mr-2">
+              <span class="emoji">➕</span>
+            </span>
+            Demander un Nouveau Produit
+          </p>
+          <button class="delete" (click)="closeNewProductModal()"></button>
+        </header>
+        
+        <section class="modal-card-body">
+          <div class="notification is-info is-light">
+            <span class="icon">
+              <span class="emoji">ℹ️</span>
+            </span>
+            <strong>Note:</strong> Cette demande sera envoyée à l'administrateur pour validation.
+            Seul l'admin peut ajouter de nouveaux produits au catalogue.
+          </div>
+          
+          <div class="field">
+            <label class="label">Nom du produit</label>
+            <div class="control">
+              <input class="input" type="text" placeholder="Ex: Whisky Glenfiddich 18 ans">
+            </div>
+          </div>
+          
+          <div class="field">
+            <label class="label">Catégorie</label>
+            <div class="control">
+              <div class="select is-fullwidth">
+                <select>
+                  <option>Whisky & Bourbon</option>
+                  <option>Champagne & Mousseux</option>
+                  <option>Spiritueux & Liqueurs</option>
+                  <option>Cigares Premium</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <div class="field">
+            <label class="label">Justification</label>
+            <div class="control">
+              <textarea class="textarea" placeholder="Pourquoi ce produit est-il nécessaire ?"></textarea>
+            </div>
+          </div>
+        </section>
+        
+        <footer class="modal-card-foot">
+          <button class="button is-success">Envoyer la Demande</button>
+          <button class="button" (click)="closeNewProductModal()">Annuler</button>
+        </footer>
+      </div>
+    </div>
+  }
+</div>

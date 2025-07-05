@@ -1,0 +1,38 @@
+<div class="category-card">
+  <div class="category-header" [ngClass]="category.color + '-header'">
+    <span class="category-icon">{{ category.icon }}</span>
+    <span class="category-name">{{ category.name }}</span>
+  </div>
+  
+  <div class="products-list">
+    @for (product of category.products; track product.id) {
+      <div class="product-item">
+        <div class="product-info">
+          <div class="product-name">{{ product.name }}</div>
+          <div class="product-price">{{ product.price | number:'1.0-0' }} FCFA</div>
+        </div>
+        
+        <div class="stock-controls">
+          <button 
+            class="button is-small is-warning stock-btn"
+            (click)="adjustStock(product.id, -1)"
+            [disabled]="product.stock <= 0"
+          >
+            -
+          </button>
+          
+          <div class="stock-quantity" [ngClass]="'stock-' + getStockStatus(product.stock)">
+            {{ product.stock }}
+          </div>
+          
+          <button 
+            class="button is-small is-success stock-btn"
+            (click)="adjustStock(product.id, 1)"
+          >
+            +
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,54 @@
+<div class="order-card" [class.preparing]="isPreparingMode">
+  <div class="order-header">
+    <div class="order-number">{{ order.number }}</div>
+    <div class="order-time" [class.preparing-time]="isPreparingMode">
+      {{ isPreparingMode ? 'En cours - ' + timeAgo : timeAgo }}
+    </div>
+  </div>
+  
+  <div class="order-details">
+    <div class="order-info">
+      <span><strong>Serveur:</strong> {{ order.serveurName }}</span>
+      <span><strong>Table:</strong> {{ order.tableNumber }}</span>
+    </div>
+    <div class="order-info">
+      <span><strong>Clients:</strong> {{ order.customerCount }} {{ order.customerCount > 1 ? 'personnes' : 'personne' }}</span>
+      <span><strong>Total:</strong> {{ order.totalAmount | number:'1.0-0' }} FCFA</span>
+    </div>
+    <div class="order-items-list">
+      @for (item of order.items; track $index) {
+        <div class="order-item">• {{ item.quantity }}x {{ item.productName }}</div>
+      }
+    </div>
+  </div>
+  
+  <div class="order-actions">
+    @if (!isPreparingMode) {
+      <button class="button is-success is-small" (click)="prepareOrder()">
+        <span class="icon">
+          <span class="emoji">🔥</span>
+        </span>
+        <span>Préparer</span>
+      </button>
+      <button class="button is-info is-small" (click)="viewDetails()">
+        <span class="icon">
+          <span class="emoji">👁️</span>
+        </span>
+        <span>Détails</span>
+      </button>
+    } @else {
+      <button class="button is-primary is-small" (click)="finishOrder()">
+        <span class="icon">
+          <span class="emoji">✅</span>
+        </span>
+        <span>Terminer</span>
+      </button>
+      <button class="button is-success is-small" (click)="processPayment()">
+        <span class="icon">
+          <span class="emoji">💰</span>
+        </span>
+        <span>Encaisser</span>
+      </button>
+    }
+  </div>
+</div>

@@ -1,0 +1,195 @@
+esther-pay
+│   public
+│   ├── fonts
+│   ├── icons
+│   ├── images
+│   └── favicon.ico
+│   src
+│   ├── app
+│   │   ├── core
+│   │   │   ├── guards
+│   │   │   │   ├── admin.guard.ts
+│   │   │   │   ├── auth.guard.ts
+│   │   │   │   └── role.guard.ts
+│   │   │   ├── interceptors
+│   │   │   │   ├── auth.interceptor.ts
+│   │   │   │   └── error.interceptor.ts
+│   │   │   ├── models
+│   │   │   │   ├── category.model.ts
+│   │   │   │   ├── order.model.ts
+│   │   │   │   ├── organisation.model.ts
+│   │   │   │   ├── product.model.ts
+│   │   │   │   ├── replinishment.model.ts
+│   │   │   │   ├── stock.model.ts
+│   │   │   │   └── user.model.ts
+│   │   │   └── services
+│   │   │       ├── api.service.ts
+│   │   │       ├── auth.service.ts
+│   │   │       ├── order.service.ts
+│   │   │       ├── organisation.service.ts
+│   │   │       ├── product.service.ts
+│   │   │       ├── replenishment.service.ts
+│   │   │       ├── stock.service.ts
+│   │   │       └── user.service.ts
+│   │   ├── features
+│   │   │   ├── admin
+│   │   │   │   ├── dashboard
+│   │   │   │   │   ├── dashboard.component.html
+│   │   │   │   │   ├── dashboard.component.scss
+│   │   │   │   │   └── dashboard.component.ts
+│   │   │   │   ├── layout
+│   │   │   │   │   ├── layout.component.html
+│   │   │   │   │   ├── layout.component.scss
+│   │   │   │   │   └── layout.component.ts
+│   │   │   │   ├── orders
+│   │   │   │   │   ├── orders.component.html
+│   │   │   │   │   ├── orders.component.scss
+│   │   │   │   │   └── orders.component.ts
+│   │   │   │   ├── settings
+│   │   │   │   │   ├── components
+│   │   │   │   │   │   ├── category-form
+│   │   │   │   │   │   │   ├── category-form.component.html
+│   │   │   │   │   │   │   ├── category-form.component.scss
+│   │   │   │   │   │   │   └── category-form.component.ts
+│   │   │   │   │   │   ├── product-form
+│   │   │   │   │   │   │   ├── product-form.component.html
+│   │   │   │   │   │   │   ├── product-form.component.scss
+│   │   │   │   │   │   │   └── product-form.component.ts
+│   │   │   │   │   │   └── user-form
+│   │   │   │   │   │       ├── user-form.component.html
+│   │   │   │   │   │       ├── user-form.component.scss
+│   │   │   │   │   │       └── user-form.component.ts
+│   │   │   │   │   ├── settings.component.html
+│   │   │   │   │   ├── settings.component.scss
+│   │   │   │   │   └── settings.component.ts
+│   │   │   │   ├── stock
+│   │   │   │   │   ├── stock.component.html
+│   │   │   │   │   ├── stock.component.scss
+│   │   │   │   │   └── stock.component.ts
+│   │   │   │   └── admin.routes.ts
+│   │   │   ├── auth
+│   │   │   │   ├── login
+│   │   │   │   │   ├── login.component.html
+│   │   │   │   │   ├── login.component.scss
+│   │   │   │   │   └── login.component.ts
+│   │   │   │   └── auth.routes.ts
+│   │   │   ├── barman
+│   │   │   │   ├── layout
+│   │   │   │   │   ├── layout.component.html
+│   │   │   │   │   ├── layout.component.scss
+│   │   │   │   │   └── layout.component.ts
+│   │   │   │   ├── orders-cash
+│   │   │   │   │   ├── components
+│   │   │   │   │   │   ├── order-card
+│   │   │   │   │   │   │   ├── order-card.component.html
+│   │   │   │   │   │   │   ├── order-card.component.scss
+│   │   │   │   │   │   │   └── order-card.component.ts
+│   │   │   │   │   │   └── payment-modal
+│   │   │   │   │   │       ├── payment-modal.component.html
+│   │   │   │   │   │       ├── payment-modal.component.scss
+│   │   │   │   │   │       └── payment-modal.component.ts
+│   │   │   │   │   ├── orders-cash.component.html
+│   │   │   │   │   ├── orders-cash.component.scss
+│   │   │   │   │   └── orders-cash.component.ts
+│   │   │   │   ├── replenishment
+│   │   │   │   │   ├── components
+│   │   │   │   │   │   ├── quick-replenish-modal
+│   │   │   │   │   │   │   ├── quick-replenish-modal.component.html
+│   │   │   │   │   │   │   ├── quick-replenish-modal.component.scss
+│   │   │   │   │   │   │   └── quick-replenish-modal.component.ts
+│   │   │   │   │   │   └── replenishment-form
+│   │   │   │   │   │       ├── replenishment-form.component.html
+│   │   │   │   │   │       ├── replenishment-form.component.scss
+│   │   │   │   │   │       └── replenishment-form.component.ts
+│   │   │   │   │   ├── replenishment.component.html
+│   │   │   │   │   ├── replenishment.component.scss
+│   │   │   │   │   └── replenishment.component.ts
+│   │   │   │   ├── stock-bar
+│   │   │   │   │   ├── components
+│   │   │   │   │   │   ├── category-card
+│   │   │   │   │   │   │   ├── category-card.component.html
+│   │   │   │   │   │   │   ├── category-card.component.scss
+│   │   │   │   │   │   │   └── category-card.component.ts
+│   │   │   │   │   │   └── stock-item
+│   │   │   │   │   │       ├── stock-item.component.html
+│   │   │   │   │   │       ├── stock-item.component.scss
+│   │   │   │   │   │       └── stock-item.component.ts
+│   │   │   │   │   ├── stock-bar.component.html
+│   │   │   │   │   ├── stock-bar.component.scss
+│   │   │   │   │   └── stock-bar.component.ts
+│   │   │   │   └── barman.routes.ts
+│   │   │   └── serveur
+│   │   │       ├── layout
+│   │   │       │   ├── layout.component.html
+│   │   │       │   ├── layout.component.scss
+│   │   │       │   └── layout.component.ts
+│   │   │       ├── orders
+│   │   │       │   ├── orders.component.html
+│   │   │       │   ├── orders.component.scss
+│   │   │       │   └── orders.component.ts
+│   │   │       └── serveur.routes.ts
+│   │   ├── shared
+│   │   │   ├── components
+│   │   │   │   ├── card-metric
+│   │   │   │   │   ├── card-metric.component.html
+│   │   │   │   │   ├── card-metric.component.scss
+│   │   │   │   │   └── card-metric.component.ts
+│   │   │   │   ├── loader
+│   │   │   │   │   ├── loader.component.html
+│   │   │   │   │   ├── loader.component.scss
+│   │   │   │   │   └── loader.component.ts
+│   │   │   │   ├── modal
+│   │   │   │   │   ├── modal.component.html
+│   │   │   │   │   ├── modal.component.scss
+│   │   │   │   │   └── modal.component.ts
+│   │   │   │   ├── navbar
+│   │   │   │   │   ├── navbar.component.html
+│   │   │   │   │   ├── navbar.component.scss
+│   │   │   │   │   └── navbar.component.ts
+│   │   │   │   ├── notification
+│   │   │   │   │   ├── notification.component.html
+│   │   │   │   │   ├── notification.component.scss
+│   │   │   │   │   └── notification.component.ts
+│   │   │   │   └── sidebar
+│   │   │   │       ├── sidebar.component.html
+│   │   │   │       ├── sidebar.component.scss
+│   │   │   │       └── sidebar.component.ts
+│   │   │   ├── directives
+│   │   │   │   └── click-outside.directive.ts
+│   │   │   └── pipes
+│   │   │       ├── currency-fcfa.pipe.ts
+│   │   │       └── time-ago.pipe.ts
+│   │   ├── app.component.html
+│   │   ├── app.component.scss
+│   │   ├── app.component.ts
+│   │   ├── app.config.server.ts
+│   │   ├── app.config.ts
+│   │   ├── app.routes.server.ts
+│   │   └── app.routes.ts
+│   ├── styles
+│   │   ├── components
+│   │   │   ├── _buttons.scss
+│   │   │   ├── _cards.scss
+│   │   │   ├── _forms.scss
+│   │   │   ├── _modals.scss
+│   │   │   ├── _sidebar.scss
+│   │   │   └── _tables.scss
+│   │   ├── themes
+│   │   │   ├── _admin.scss
+│   │   │   └── _barman.scss
+│   │   ├── main.scss
+│   │   └── variables.scss
+│   ├── index.html
+│   ├── main.server.ts
+│   ├── main.ts
+│   ├── server.ts
+│   └── styles.scss
+│   .editorconfig
+│   .gitignore
+│   angular.json
+│   package.json
+│   README.md
+│   tsconfig.app.json
+│   tsconfig.json
+│   tsconfig.spec.json
+│   yarn.lock
