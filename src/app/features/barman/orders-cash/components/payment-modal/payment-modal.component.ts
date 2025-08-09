@@ -1,21 +1,8 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Order } from '../../orders-cash.component';
 
-interface Order {
-  id: string;
-  number: string;
-  serveurName: string;
-  tableNumber: number;
-  totalAmount: number;
-  items: OrderItem[];
-}
-
-interface OrderItem {
-  productName: string;
-  quantity: number;
-  unitPrice: number;
-}
 
 interface PaymentData {
   orderId: string;
@@ -42,7 +29,7 @@ export class PaymentModalComponent implements OnInit {
 
   ngOnInit() {
     if (this.order) {
-      this.amountReceived = this.order.totalAmount;
+      this.amountReceived = this.order.total_amount;
       this.calculateChange();
     }
   }
@@ -53,7 +40,7 @@ export class PaymentModalComponent implements OnInit {
 
   private calculateChange() {
     if (this.order && this.paymentType === 'cash') {
-      this.changeAmount = Math.max(0, this.amountReceived - this.order.totalAmount);
+      this.changeAmount = Math.max(0, this.amountReceived - this.order.total_amount);
     } else {
       this.changeAmount = 0;
     }
@@ -66,7 +53,7 @@ export class PaymentModalComponent implements OnInit {
   confirmPayment() {
     if (!this.order) return;
 
-    if (this.paymentType === 'cash' && this.amountReceived < this.order.totalAmount) {
+    if (this.paymentType === 'cash' && this.amountReceived < this.order.total_amount) {
       alert('Le montant reçu est insuffisant !');
       return;
     }

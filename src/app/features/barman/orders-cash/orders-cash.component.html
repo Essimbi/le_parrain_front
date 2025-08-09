@@ -1,19 +1,16 @@
 <div class="orders-cash-page">
-  <!-- Page Header -->
   <div class="page-header">
     <h1 class="title is-3 has-text-primary">Commandes & Caisse</h1>
     <p class="subtitle is-6 has-text-grey">Gérez les commandes reçues et votre caisse</p>
   </div>
 
-  <!-- Cash Metrics -->
   <div class="columns is-multiline mb-6">
     <div class="column is-3">
       <div class="card metric-card">
         <div class="card-content">
           <p class="heading">Caisse du jour</p>
-          <p class="title is-4 has-text-primary">{{ cashMetrics.dailyTotal | number:'1.0-0' }} FCFA</p>
-          <p class="subtitle is-7 has-text-success">+5,200 depuis ce matin</p>
-        </div>
+          <p class="title is-4 has-text-primary">{{ cashMetrics.total_revenue | number:'1.0-0' }} FCFA</p>
+          </div>
       </div>
     </div>
 
@@ -32,8 +29,7 @@
         <div class="card-content">
           <p class="heading">Paiements Cash</p>
           <p class="title is-4 has-text-success">{{ cashMetrics.cashPayments | number:'1.0-0' }} FCFA</p>
-          <p class="subtitle is-7">{{ getCashPercentage() }}% du total</p>
-        </div>
+          </div>
       </div>
     </div>
 
@@ -42,15 +38,12 @@
         <div class="card-content">
           <p class="heading">Mobile Money</p>
           <p class="title is-4 has-text-link">{{ cashMetrics.mobileMoneyPayments | number:'1.0-0' }} FCFA</p>
-          <p class="subtitle is-7">{{ getMobileMoneyPercentage() }}% du total</p>
-        </div>
+          </div>
       </div>
     </div>
   </div>
 
-  <!-- Orders Management -->
   <div class="columns">
-    <!-- New Orders -->
     <div class="column is-6">
       <div class="card orders-section">
         <div class="card-header has-background-danger">
@@ -63,10 +56,10 @@
             @for (order of newOrders; track order.id) {
               <app-order-card
                 [order]="order"
-                [timeAgo]="getTimeAgo(order.createdAt)"
+                [timeAgo]="getTimeAgo(order.created_at)"
                 [isPreparingMode]="false"
-                (onPrepare)="onPrepareOrder($event)"
-                (onViewDetails)="onViewDetails($event)"
+                (onPrepare)="onPrepareOrder(order.id)"
+                (onViewDetails)="onViewDetails(order.id)"
               ></app-order-card>
             } @empty {
               <div class="empty-state">
@@ -81,7 +74,6 @@
       </div>
     </div>
 
-    <!-- Orders in Progress -->
     <div class="column is-6">
       <div class="card orders-section">
         <div class="card-header has-background-warning">
@@ -94,10 +86,10 @@
             @for (order of preparingOrders; track order.id) {
               <app-order-card
                 [order]="order"
-                [timeAgo]="getTimeAgo(order.createdAt)"
+                [timeAgo]="getTimeAgo(order.created_at)"
                 [isPreparingMode]="true"
-                (onFinish)="onFinishOrder($event)"
-                (onProcessPayment)="onProcessPayment($event)"
+                (onFinish)="onFinishOrder(order.id)"
+                (onProcessPayment)="onProcessPayment(order.id)"
               ></app-order-card>
             } @empty {
               <div class="empty-state">
@@ -113,12 +105,19 @@
     </div>
   </div>
 
-  <!-- Payment Modal -->
   @if (showPaymentModal) {
     <app-payment-modal
       [order]="selectedOrderForPayment"
       (onPaymentComplete)="onPaymentComplete($event)"
       (onClose)="closePaymentModal()"
     ></app-payment-modal>
+  }
+  
+  @if (showDetailsModal) {
+    <app-order-details-modal
+      [order]="selectedOrderForDetails"
+      [userRole]="userRole"
+      (close)="closeDetailsModal()"
+    ></app-order-details-modal>
   }
 </div>

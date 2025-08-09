@@ -3,11 +3,15 @@ import { BarmanLayoutComponent } from './features/barman/layout/layout.component
 import { OrdersCashComponent } from './features/barman/orders-cash/orders-cash.component';
 import { StockBarComponent } from './features/barman/stock-bar/stock-bar.component';
 import { ReplenishmentComponent } from './features/barman/replenishment/replenishment.component';
+import { LoginComponent } from './features/auth/login/login.component';
+import { AuthGuard } from './core/guards/auth.guard';
+import { BarmanGuard } from './core/guards/barman.guard';
 
 export const routes: Routes = [
   {
     path: 'barman',
     component: BarmanLayoutComponent,
+    canActivate: [AuthGuard, BarmanGuard],
     children: [
       {
         path: '',
@@ -30,7 +34,11 @@ export const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: '/barman',
+    redirectTo: 'login',
     pathMatch: 'full'
+  },
+  {
+    path: 'login',
+    component: LoginComponent
   }
 ];

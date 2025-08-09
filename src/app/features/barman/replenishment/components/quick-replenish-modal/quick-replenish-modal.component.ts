@@ -1,15 +1,8 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Product } from '../../../../../core/models/product.model';
 
-interface Product {
-  id: string;
-  name: string;
-  category: string;
-  currentStock: number;
-  minStock: number;
-  price: number;
-}
 
 interface QuickReplenishItem {
   productId: string;
@@ -48,15 +41,15 @@ export class QuickReplenishModalComponent implements OnInit {
       productId: product.id,
       productName: product.name,
       category: product.category,
-      currentStock: product.currentStock,
+      currentStock: product.stock_quantity,
       suggestedQuantity: this.calculateSuggestedQuantity(product),
       quantity: this.calculateSuggestedQuantity(product),
-      selected: product.currentStock <= 2
+      selected: product.stock_quantity <= 2
     }));
   }
 
   private calculateSuggestedQuantity(product: Product): number {
-    const deficit = Math.max(0, product.minStock - product.currentStock);
+    const deficit = Math.max(0, product.min_threshold - product.stock_quantity);
     return deficit + 5;
   }
 

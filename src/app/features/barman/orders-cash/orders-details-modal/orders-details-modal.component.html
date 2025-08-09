@@ -1,0 +1,39 @@
+<div class="modal-backdrop" (click)="onClose()"></div>
+<div class="modal">
+  <div class="modal-header">
+    <h2 class="modal-title">Détails de la Commande {{ order?.id }}</h2>
+    <button class="close-button" (click)="onClose()">✕</button>
+  </div>
+  <div class="modal-body">
+    @if (order) {
+      <div class="order-details">
+        <p><strong>Statut:</strong> {{ order.status === 'ouverte' ? 'Ouverte' : order.status === 'servie' ? 'En préparation' : 'Fermée' }}</p>
+        <p><strong>Serveur:</strong> {{ order.serveurName || 'Non spécifié' }}</p>
+        <p><strong>Table:</strong> {{ order.tableNumber || 'Non spécifié' }}</p>
+        <p><strong>Nombre de clients:</strong> {{ order.number_of_customers }}</p>
+        <p><strong>Heure de commande:</strong> {{ getTimeAgo(order.created_at) }}</p>
+        <p><strong>Total:</strong> {{ order.total_amount | number:'1.0-0' }} FCFA</p>
+        <h3>Articles</h3>
+        <ul>
+          @for (item of order.items; track item.product) {
+            <li>{{ item.quantity }} x {{ item.product }} ({{ item.unit_price | number:'1.0-0' }} FCFA chacun)</li>
+          }
+        </ul>
+      </div>
+    } @else {
+      <p>Aucune commande sélectionnée</p>
+    }
+  </div>
+  <div class="modal-footer">
+    @if (order) {
+      @if (order.status === 'ouverte' && userRole === 'barman') {
+        <button class="action-button prepare" (click)="onPrepare()">Préparer la commande</button>
+      }
+      @if (order.status === 'servie') {
+        <button class="action-button finish" (click)="onFinish()">Marquer comme prête</button>
+        <button class="action-button pay" (click)="onPay()">Traiter le paiement</button>
+      }
+    }
+    <button class="action-button close" (click)="onClose()">Fermer</button>
+  </div>
+</div>

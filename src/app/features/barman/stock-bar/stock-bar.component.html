@@ -57,7 +57,7 @@
               <div>
                 <p class="heading">Valeur Stock</p>
                 <p class="title is-4 has-text-success">{{ stockMetrics.stockValue | number:'1.0-0' }} FCFA</p>
-                <p class="subtitle is-7 has-text-success">+12,000 cette semaine</p>
+                <!-- <p class="subtitle is-7 has-text-success">+12,000 cette semaine</p> -->
               </div>
             </div>
             <div class="level-right">
@@ -94,9 +94,9 @@
 
   <!-- Stock Categories -->
   <div class="stock-categories">
-    @for (category of categories; track category.id) {
+    @for (cat of categories; track cat.id) {
       <app-category-card
-        [category]="category"
+        [category]="cat"
         (onStockAdjustment)="onStockAdjustment($event.productId, $event.change)"
       ></app-category-card>
     }

@@ -1,7 +1,7 @@
 <div class="category-card">
   <div class="category-header" [ngClass]="category.color + '-header'">
-    <span class="category-icon">{{ category.icon }}</span>
-    <span class="category-name">{{ category.name }}</span>
+    <!-- <span class="category-icon">{{ category.icon }}</span> -->
+    <span class="category-name" style="color: black !important;">{{ category.name }}</span>
   </div>
   
   <div class="products-list">
@@ -13,24 +13,24 @@
         </div>
         
         <div class="stock-controls">
-          <button 
+          <!-- <button 
             class="button is-small is-warning stock-btn"
             (click)="adjustStock(product.id, -1)"
-            [disabled]="product.stock <= 0"
+            [disabled]="product.stock_quantity <= 0"
           >
             -
-          </button>
+          </button> -->
           
-          <div class="stock-quantity" [ngClass]="'stock-' + getStockStatus(product.stock)">
-            {{ product.stock }}
+          <div class="stock-quantity" [ngClass]="'stock-' + getStockStatus(product.stock_quantity)">
+            Qté en stock <b>{{ product.stock_quantity }}</b>
           </div>
           
-          <button 
+          <!-- <button 
             class="button is-small is-success stock-btn"
             (click)="adjustStock(product.id, 1)"
           >
             +
-          </button>
+          </button> -->
         </div>
       </div>
     }

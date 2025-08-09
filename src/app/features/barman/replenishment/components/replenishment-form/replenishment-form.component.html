@@ -34,7 +34,7 @@
                 <option value="">Sélectionner un produit</option>
                 @for (product of filteredProducts; track product.id) {
                   <option [value]="product.id">
-                    {{ product.name }} (Stock: {{ product.currentStock }})
+                    {{ product.name }} (Stock: {{ product.stock_quantity }})
                   </option>
                 }
               </select>
@@ -42,9 +42,9 @@
           </div>
           @if (selectedProduct) {
             <p class="help">
-              Stock actuel: {{ selectedProduct.currentStock }} | 
-              Minimum: {{ selectedProduct.minStock }}
-              @if (selectedProduct.currentStock <= selectedProduct.minStock) {
+              Stock actuel: {{ selectedProduct.stock_quantity }} | 
+              Minimum: {{ selectedProduct.min_threshold }}
+              @if (selectedProduct.stock_quantity <= selectedProduct.min_threshold) {
                 <span class="has-text-danger"> - ⚠️ Stock critique</span>
               }
             </p>

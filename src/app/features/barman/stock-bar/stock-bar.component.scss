@@ -1,4 +1,5 @@
 .stock-bar-page {
+  padding: 2rem;
   max-width: 1400px;
   margin: 0 auto;
 }
@@ -8,76 +9,178 @@
   padding: 1.5rem;
   background: white;
   border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
   border-left: 5px solid #3498db;
+
+  .title {
+    color: #2c3e50;
+    font-weight: 700;
+  }
+
+  .subtitle {
+    color: #7f8c8d;
+  }
 }
 
 .metric-card {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 
   &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
   }
 
   &.critical {
     border-left: 4px solid #e74c3c;
     
-    &:hover {
-      box-shadow: 0 8px 25px rgba(231,76,60,0.2);
+    .heading {
+      color: #e74c3c;
     }
   }
 
   .card-content {
     padding: 1.5rem;
-  }
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-grow: 1;
 
-  .heading {
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: #7f8c8d;
-    margin-bottom: 0.5rem;
-  }
+    .heading {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #95a5a6;
+      margin-bottom: 0.25rem;
+    }
+    
+    .title {
+      font-weight: 700;
+      font-size: 1.5rem;
+      line-height: 1.2;
+    }
 
-  .emoji {
-    font-size: 2rem;
+    .subtitle {
+      font-size: 0.75rem;
+      color: #bdc3c7;
+    }
+
+    .icon-container {
+      font-size: 2rem;
+    }
   }
 }
 
 .stock-categories {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 25px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
 }
 
-// Responsive
-@media (max-width: 1024px) {
-  .stock-categories {
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
+.category-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    color: white;
+    font-weight: 600;
+    font-size: 1.2rem;
+
+    .emoji {
+      font-size: 1.5rem;
+      margin-right: 0.75rem;
+    }
+  }
+
+  .card-content {
+    padding: 1rem;
+
+    .product-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
   }
 }
 
-@media (max-width: 768px) {
-  .stock-bar-page {
-    padding: 0 10px;
+.product-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0.5rem;
+  border-bottom: 1px solid #ecf0f1;
+  
+  &:last-child {
+    border-bottom: none;
   }
   
-  .page-header {
-    padding: 1rem;
-    margin-bottom: 1rem;
+  .product-info {
+    display: flex;
+    flex-direction: column;
+    
+    .product-name {
+      font-weight: 500;
+      color: #34495e;
+    }
+    
+    .product-stock {
+      font-size: 0.8rem;
+      color: #95a5a6;
+      
+      &.low {
+        color: #e74c3c;
+        font-weight: 600;
+      }
+    }
   }
-  
-  .metric-card .card-content {
-    padding: 1rem;
-  }
-  
-  .stock-categories {
-    grid-template-columns: 1fr;
-    gap: 15px;
+
+  .actions {
+    display: flex;
+    align-items: center;
+
+    .button {
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      border: 1px solid #bdc3c7;
+      background: #f8f9fa;
+      color: #34495e;
+      font-weight: 700;
+      font-size: 1rem;
+      line-height: 1;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.2s;
+      
+      &:hover {
+        background-color: #ecf0f1;
+        transform: scale(1.05);
+      }
+      
+      &.is-small {
+        font-size: 0.8rem;
+      }
+      
+      &:first-child {
+        margin-right: 0.5rem;
+      }
+    }
   }
 }

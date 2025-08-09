@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
+
 
 @Component({
   selector: 'app-barman-layout',
@@ -13,8 +14,11 @@ export class BarmanLayoutComponent {
   // PAS DE setInterval - juste une propriété simple
   currentTime = new Date();
 
+  constructor(private router: Router) {}
+
   logout() {
-    console.log('Déconnexion...');
+    localStorage.clear()
+    this.router.navigate(['/login']);
   }
 
   // Méthode pour obtenir l'heure actuelle dans le template

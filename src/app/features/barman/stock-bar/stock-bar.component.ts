@@ -1,28 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CategoryCardComponent } from './components/category-card/category-card.component';
+import { Subject } from 'rxjs';
+import { CategoryData, Product } from '../../../core/models/product.model';
 
-interface Product {
-  id: string;
-  name: string;
-  price: number;
-  stock: number;
-  category: 'whisky' | 'champagne' | 'spiritueux' | 'cigares';
-}
-
-interface StockMetrics {
+export interface StockMetrics {
   totalProducts: number;
   criticalStock: number;
   stockValue: number;
   categories: number;
-}
-
-interface CategoryData {
-  id: string;
-  name: string;
-  icon: string;
-  color: string;
-  products: Product[];
 }
 
 @Component({
@@ -32,235 +18,123 @@ interface CategoryData {
   templateUrl: './stock-bar.component.html',
   styleUrl: './stock-bar.component.scss'
 })
-export class StockBarComponent implements OnInit {
+export class StockBarComponent implements OnInit, OnDestroy {
   stockMetrics: StockMetrics = {
-    totalProducts: 47,
-    criticalStock: 6,
-    stockValue: 485200,
-    categories: 4
+    totalProducts: 0,
+    criticalStock: 0,
+    stockValue: 0,
+    categories: 0
   };
 
-  categories: CategoryData[] = [
-    {
-      id: 'whisky',
-      name: 'Whiskys & Bourbon',
-      icon: '🥃',
-      color: 'whisky',
-      products: [
-        {
-          id: 'w1',
-          name: 'Jack Daniel\'s',
-          price: 12500,
-          stock: 3,
-          category: 'whisky'
-        },
-        {
-          id: 'w2',
-          name: 'Chivas Regal 18',
-          price: 18000,
-          stock: 8,
-          category: 'whisky'
-        },
-        {
-          id: 'w3',
-          name: 'Macallan 12',
-          price: 25000,
-          stock: 2,
-          category: 'whisky'
-        },
-        {
-          id: 'w4',
-          name: 'Jameson',
-          price: 15000,
-          stock: 6,
-          category: 'whisky'
-        }
-      ]
-    },
-    {
-      id: 'champagne',
-      name: 'Champagnes & Mousseux',
-      icon: '🍾',
-      color: 'champagne',
-      products: [
-        {
-          id: 'c1',
-          name: 'Moët & Chandon',
-          price: 35000,
-          stock: 5,
-          category: 'champagne'
-        },
-        {
-          id: 'c2',
-          name: 'Dom Pérignon',
-          price: 85000,
-          stock: 1,
-          category: 'champagne'
-        },
-        {
-          id: 'c3',
-          name: 'Veuve Clicquot',
-          price: 45000,
-          stock: 7,
-          category: 'champagne'
-        },
-        {
-          id: 'c4',
-          name: 'Cristal Roederer',
-          price: 120000,
-          stock: 2,
-          category: 'champagne'
-        }
-      ]
-    },
-    {
-      id: 'spiritueux',
-      name: 'Spiritueux & Liqueurs',
-      icon: '🍸',
-      color: 'spiritueux',
-      products: [
-        {
-          id: 's1',
-          name: 'Vodka Grey Goose',
-          price: 15000,
-          stock: 6,
-          category: 'spiritueux'
-        },
-        {
-          id: 's2',
-          name: 'Rhum Diplomatico',
-          price: 22000,
-          stock: 2,
-          category: 'spiritueux'
-        },
-        {
-          id: 's3',
-          name: 'Cognac Hennessy',
-          price: 28000,
-          stock: 4,
-          category: 'spiritueux'
-        },
-        {
-          id: 's4',
-          name: 'Gin Bombay',
-          price: 18000,
-          stock: 1,
-          category: 'spiritueux'
-        },
-        {
-          id: 's5',
-          name: 'Tequila Patron',
-          price: 24000,
-          stock: 3,
-          category: 'spiritueux'
-        }
-      ]
-    },
-    {
-      id: 'cigares',
-      name: 'Cigares Premium',
-      icon: '🚬',
-      color: 'cigares',
-      products: [
-        {
-          id: 'cig1',
-          name: 'Cohiba Robusto',
-          price: 8500,
-          stock: 12,
-          category: 'cigares'
-        },
-        {
-          id: 'cig2',
-          name: 'Montecristo No.2',
-          price: 12000,
-          stock: 3,
-          category: 'cigares'
-        },
-        {
-          id: 'cig3',
-          name: 'Romeo y Julieta',
-          price: 7500,
-          stock: 8,
-          category: 'cigares'
-        },
-        {
-          id: 'cig4',
-          name: 'Partagas Serie D',
-          price: 10000,
-          stock: 5,
-          category: 'cigares'
-        }
-      ]
-    }
-  ];
+  categories: CategoryData[] = [];
+
+  private destroy$ = new Subject<void>();
+
+  private categoryDisplayInfo: { [key: string]: { icon: string; color: string } } = {
+    'Bières locales': { icon: '🍺', color: 'blue' },
+    'Bières importées': { icon: '🍻', color: 'darkblue' },
+    'Jus locaux': { icon: '🍹', color: 'orange' },
+    'Sodas & Eaux': { icon: '🥤', color: 'grey' }
+  };
+
+  constructor() {}
 
   ngOnInit() {
-    this.updateMetrics();
+    this.loadStockData();
   }
 
-  onStockAdjustment(productId: string, change: number) {
-    // Trouver le produit dans toutes les catégories
-    for (const category of this.categories) {
-      const product = category.products.find(p => p.id === productId);
-      if (product) {
-        const newStock = Math.max(0, product.stock + change);
-        product.stock = newStock;
-        
-        this.updateMetrics();
-        this.showNotification(
-          `Stock de ${product.name} mis à jour: ${newStock}`,
-          newStock <= 4 ? 'warning' : 'success'
-        );
-        break;
-      }
-    }
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
-  private updateMetrics() {
-    let totalProducts = 0;
-    let criticalStock = 0;
-    let stockValue = 0;
+  private loadStockData(): void {
+    const mockProducts: Product[] = [
+      // Bières locales
+      { id: 'prod1', name: '33 Export', price: 1500, stock_quantity: 50, is_below_threshold: false, description: 'Bière blonde populaire', image_url: '', min_threshold: 5, unit: 'bouteille', category: 'Bières locales' },
+      { id: 'prod2', name: 'Mutzig', price: 1500, stock_quantity: 10, is_below_threshold: false, description: 'Bière forte de référence', image_url: '', min_threshold: 5, unit: 'bouteille', category: 'Bières locales' },
+      { id: 'prod3', name: 'Beaufort', price: 1500, stock_quantity: 75, is_below_threshold: false, description: 'La plus ancienne des bières', image_url: '', min_threshold: 5, unit: 'bouteille', category: 'Bières locales' },
+      { id: 'prod4', name: 'Castel', price: 1500, stock_quantity: 3, is_below_threshold: true, description: 'Bière blonde légère', image_url: '', min_threshold: 5, unit: 'bouteille', category: 'Bières locales' },
 
-    for (const category of this.categories) {
-      for (const product of category.products) {
-        totalProducts++;
-        if (product.stock <= 4) {
-          criticalStock++;
-        }
-        stockValue += product.price * product.stock;
+      // Bières importées
+      { id: 'prod5', name: 'Heineken', price: 2000, stock_quantity: 20, is_below_threshold: false, description: 'Bière importée Premium', image_url: '', min_threshold: 5, unit: 'bouteille', category: 'Bières importées' },
+      { id: 'prod6', name: 'Guinness', price: 2500, stock_quantity: 4, is_below_threshold: true, description: 'Bière noire robuste', image_url: '', min_threshold: 5, unit: 'bouteille', category: 'Bières importées' },
+      
+      // Jus locaux
+      { id: 'prod7', name: 'Jus de Bissap', price: 500, stock_quantity: 30, is_below_threshold: false, description: 'Jus de fleur d\'hibiscus', image_url: '', min_threshold: 5, unit: 'verre', category: 'Jus locaux' },
+      { id: 'prod8', name: 'Jus de Tamarin', price: 500, stock_quantity: 5, is_below_threshold: false, description: 'Jus de tamarin frais', image_url: '', min_threshold: 5, unit: 'verre', category: 'Jus locaux' },
+      { id: 'prod9', name: 'Jus de Gingembre', price: 1000, stock_quantity: 15, is_below_threshold: false, description: 'Jus de gingembre épicé', image_url: '', min_threshold: 5, unit: 'verre', category: 'Jus locaux' },
+
+      // Sodas & Eaux
+      { id: 'prod10', name: 'Coca-Cola', price: 600, stock_quantity: 60, is_below_threshold: false, description: 'Soda classique', image_url: '', min_threshold: 5, unit: 'bouteille', category: 'Sodas & Eaux' },
+      { id: 'prod11', name: 'Fanta', price: 600, stock_quantity: 2, is_below_threshold: true, description: 'Soda à l\'orange', image_url: '', min_threshold: 5, unit: 'bouteille', category: 'Sodas & Eaux' },
+      { id: 'prod12', name: 'Eau Minérale', price: 500, stock_quantity: 100, is_below_threshold: false, description: 'Eau en bouteille', image_url: '', min_threshold: 5, unit: 'bouteille', category: 'Sodas & Eaux' }
+    ];
+
+    const mockCategories: CategoryData[] = [
+      { id: 'cat1', name: 'Bières locales', icon: this.categoryDisplayInfo['Bières locales'].icon, color: this.categoryDisplayInfo['Bières locales'].color, products: [] },
+      { id: 'cat2', name: 'Bières importées', icon: this.categoryDisplayInfo['Bières importées'].icon, color: this.categoryDisplayInfo['Bières importées'].color, products: [] },
+      { id: 'cat3', name: 'Jus locaux', icon: this.categoryDisplayInfo['Jus locaux'].icon, color: this.categoryDisplayInfo['Jus locaux'].color, products: [] },
+      { id: 'cat4', name: 'Sodas & Eaux', icon: this.categoryDisplayInfo['Sodas & Eaux'].icon, color: this.categoryDisplayInfo['Sodas & Eaux'].color, products: [] }
+    ];
+
+    // Simuler l'assignation des produits aux catégories
+    mockProducts.forEach(product => {
+      const category = mockCategories.find(c => c.name === product.category);
+      if (category) {
+        category.products.push(product);
       }
-    }
+    });
+
+    this.categories = mockCategories;
+    this.updateMetrics(mockProducts);
+  }
+
+  private updateMetrics(allProducts: Product[]): void {
+    let totalStockValue = 0;
+    let criticalStockCount = 0;
+
+    allProducts.forEach(product => {
+      totalStockValue += product.price * product.stock_quantity;
+      if (product.is_below_threshold) {
+        criticalStockCount++;
+      }
+    });
 
     this.stockMetrics = {
-      totalProducts,
-      criticalStock,
-      stockValue,
+      totalProducts: allProducts.length,
+      criticalStock: criticalStockCount,
+      stockValue: totalStockValue,
       categories: this.categories.length
     };
   }
 
+  onStockAdjustment(productId: string, change: number) {
+    for (const category of this.categories) {
+      const productIndex = category.products.findIndex(p => p.id === productId);
+      if (productIndex !== -1) {
+        const productToUpdate = category.products[productIndex];
+        const newStockQuantity = Math.max(0, productToUpdate.stock_quantity + change);
+        
+        // Simuler la mise à jour
+        productToUpdate.stock_quantity = newStockQuantity;
+        productToUpdate.is_below_threshold = newStockQuantity <= productToUpdate.min_threshold;
+        
+        this.showNotification(`Stock de ${productToUpdate.name} mis à jour : ${newStockQuantity}`, productToUpdate.is_below_threshold ? 'warning' : 'success');
+        this.updateMetrics(this.categories.flatMap(c => c.products));
+        return;
+      }
+    }
+  }
+
   private showNotification(message: string, type: 'success' | 'warning' = 'success') {
     console.log(`[${type.toUpperCase()}] ${message}`);
-    // TODO: Implémenter système de notifications
-  }
-
-  // Utilitaires pour le template
-  getTotalProducts(): number {
-    return this.stockMetrics.totalProducts;
-  }
-
-  getCriticalStockCount(): number {
-    return this.stockMetrics.criticalStock;
-  }
-
-  getStockValue(): number {
-    return this.stockMetrics.stockValue;
   }
 
   getCurrentTime(): string {
-    return new Date().toLocaleTimeString('fr-FR', { 
-      hour: '2-digit', 
-      minute: '2-digit' 
+    return new Date().toLocaleTimeString('fr-FR', {
+      hour: '2-digit',
+      minute: '2-digit'
     });
   }
 }

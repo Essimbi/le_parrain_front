@@ -1,17 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Order } from '../../../../../core/models/order.model';
 
-interface Order {
-  id: string;
-  number: string;
-  serveurName: string;
-  tableNumber: number;
-  customerCount: number;
-  totalAmount: number;
-  status: 'new' | 'preparing' | 'ready';
-  createdAt: Date;
-  items: OrderItem[];
-}
 
 interface OrderItem {
   productName: string;
