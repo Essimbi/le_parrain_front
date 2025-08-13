@@ -465,3 +465,63 @@ $white: #ffffff;
     }
   }
 }
+
+.modal-body.details-body {
+  .detail-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    border-bottom: 1px dashed $light-grey;
+    
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &.full-width {
+      flex-direction: column;
+      
+      .value {
+        margin-top: 0.5rem;
+      }
+    }
+
+    .label {
+      font-weight: 600;
+      color: $primary;
+    }
+
+    .value {
+      color: $dark-grey;
+      text-align: right;
+
+      &.status-cell {
+        text-align: left;
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        line-height: 1;
+
+        &.status-approved {
+          background-color: $success-light;
+          color: $success;
+        }
+        &.status-pending {
+          background-color: $warning-light;
+          color: $warning;
+        }
+        &.status-rejected {
+          background-color: $danger-light;
+          color: $danger;
+        }
+      }
+      
+      &.comment-text {
+        font-style: italic;
+        color: $grey;
+      }
+    }
+  }
+}

@@ -9,7 +9,7 @@ import { Product, Category, CashMetrics, ServeurDailyRevenueResponse } from '../
   providedIn: 'root'
 })
 export class ProductService {
-  private apiUrl = 'http://127.0.0.1:8000/api';
+  private apiUrl = 'https://le-parrain.mbotchakfoundation.org/api';
 
   constructor(private http: HttpClient) { }
 
@@ -22,24 +22,24 @@ export class ProductService {
 
   getProducts(): Observable<any> {
     const headers = this.getAuthHeaders();
-    return this.http.get<any>(`${this.apiUrl}/products/`, {headers});
+    return this.http.get<any>(`${this.apiUrl}/products`, {headers});
   }
 
   getCategories(): Observable<any> {
     const headers = this.getAuthHeaders();
-    return this.http.get<any>(`${this.apiUrl}/categories/`, {headers});
+    return this.http.get<any>(`${this.apiUrl}/categories`, {headers});
   }
 
   updateProductStock(productId: string, newStockQuantity: number): Observable<Product> {
     const headers = this.getAuthHeaders();
     const payload = { stock_quantity: newStockQuantity };
-    return this.http.patch<Product>(`${this.apiUrl}/products/${productId}/update-stock/`, payload, {headers});
+    return this.http.patch<Product>(`${this.apiUrl}/products/${productId}/update-stock`, payload, {headers});
   }
 
   createStockRequest(productId: string, quantity: number): Observable<any> {
     const headers = this.getAuthHeaders();
     const payload = { product: productId, requested_quantity: quantity };
-    return this.http.post(`${this.apiUrl}/stock-requests/`, payload, {headers});
+    return this.http.post(`${this.apiUrl}/stock-requests`, payload, {headers});
   }
 
   getProductsBelowThreshold(): Observable<any> {

@@ -31,11 +31,12 @@ export class ReplenishmentComponent implements OnInit, OnDestroy {
   itemsPerPage = 10;
   totalPages = 1;
   searchTerm = '';
-  selectedStatus: 'all' | 'en_attente' | 'approuve' | 'rejete' = 'all';
+  selectedStatus: 'all' | 'pending' | 'approved' | 'rejected' = 'all';
 
   isFormModalOpen = false;
+  isDetailsModalOpen = false;
+  selectedRequest: any | null = null;
   
-  // Nouveau format de formulaire pour correspondre au back-end
   newRequestForm = {
     product_id: '',
     requested_quantity: 1,
@@ -43,7 +44,7 @@ export class ReplenishmentComponent implements OnInit, OnDestroy {
     comment: ''
   };
 
-  priorities = ['faible', 'normal', 'élevée', 'critique'];
+  priorities = ['normal', 'urgent', 'critical'];
   
   private destroy$ = new Subject<void>();
 
@@ -58,22 +59,53 @@ export class ReplenishmentComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+  submitNewRequest(): void {
+    if (!this.newRequestForm.product_id || this.newRequestForm.requested_quantity <= 0) {
+      alert('Veuillez sélectionner un produit et entrer une quantité valide.');
+      return;
+    }
+    
+    const payload = this.newRequestForm;
+    
+    this.replenishmentService.createReplenishmentRequest(payload).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (response) => {
+        console.log('Demande créée avec succès', response);
+        this.closeFormModal();
+        this.loadData();
+        alert('Demande de réapprovisionnement créée avec succès !');
+      },
+      error: (err) => {
+        console.error('Erreur lors de la création de la demande', err);
+        alert('Échec de la création de la demande.');
+      }
+    });
+  }
+
   private loadData(): void {
     this.isLoading = true;
     forkJoin({
       requests: this.replenishmentService.getReplenishmentRequests(),
       products: this.replenishmentService.getUrgentProducts(),
-      metrics: this.replenishmentService.getMetrics()
+      // metrics: this.replenishmentService.getMetrics()
     }).pipe(takeUntil(this.destroy$)).subscribe({
       next: (results) => {
         this.allRequests = results.requests.data;
         this.products = results.products.data;
-        this.metrics = results.metrics.data;
+        // this.metrics = results.metrics.data;
         this.applyFilters();
         this.isLoading = false;
       },
       error: (err) => {
         console.error('Erreur lors du chargement des données de réapprovisionnement', err);
+        this.allRequests = [];
+        this.products = [];
+        this.metrics = {
+          pending_requests_count: 0,
+          critical_products_count: 0,
+          last_approved_request_date: null,
+          last_approved_request_quantity: null,
+        };
+        this.applyFilters();
         this.isLoading = false;
       }
     });
@@ -88,7 +120,7 @@ export class ReplenishmentComponent implements OnInit, OnDestroy {
       const searchTermLower = this.searchTerm.toLowerCase();
       tempRequests = tempRequests.filter(r =>
         r.id.toLowerCase().includes(searchTermLower) ||
-        r.items.some((item: any) => item.product_name.toLowerCase().includes(searchTermLower))
+        r.product?.name.toLowerCase().includes(searchTermLower)
       );
     }
     this.filteredRequests = tempRequests;
@@ -112,19 +144,19 @@ export class ReplenishmentComponent implements OnInit, OnDestroy {
 
   getStatusClass(status: string): string {
     switch (status) {
-      case 'en_attente': return 'status-pending';
-      case 'approuve': return 'status-approved';
-      case 'rejete': return 'status-rejected';
+      case 'pending': return 'status-pending';
+      case 'approved': return 'status-approved';
+      case 'rejected': return 'status-rejected';
       default: return '';
     }
   }
 
   getReadableStatus(status: string): string {
     switch (status) {
-      case 'en_attente': return 'En attente';
-      case 'approuve': return 'Approuvée';
-      case 'rejete': return 'Rejetée';
-      case 'annule': return 'Annulée';
+      case 'pending': return 'En attente';
+      case 'approved': return 'Approuvée';
+      case 'rejected': return 'Rejetée';
+      case 'cancelled': return 'Annulée';
       default: return status;
     }
   }
@@ -143,31 +175,14 @@ export class ReplenishmentComponent implements OnInit, OnDestroy {
     this.isFormModalOpen = false;
   }
 
-  submitNewRequest(): void {
-    if (!this.newRequestForm.product_id || this.newRequestForm.requested_quantity <= 0) {
-      alert('Veuillez sélectionner un produit et entrer une quantité valide.');
-      return;
-    }
-    
-    // Le payload est déjà au bon format
-    const payload = this.newRequestForm;
-    
-    this.replenishmentService.createReplenishmentRequest(payload).pipe(takeUntil(this.destroy$)).subscribe({
-      next: (response) => {
-        console.log('Demande créée avec succès', response);
-        this.closeFormModal();
-        this.loadData();
-        alert('Demande de réapprovisionnement créée avec succès !');
-      },
-      error: (err) => {
-        console.error('Erreur lors de la création de la demande', err);
-        alert('Échec de la création de la demande.');
-      }
-    });
-  }
-
   openRequestDetails(request: any): void {
-    console.log('Afficher les détails de la demande', request);
+    this.selectedRequest = request;
+    this.isDetailsModalOpen = true;
+  }
+  
+  closeDetailsModal(): void {
+    this.isDetailsModalOpen = false;
+    this.selectedRequest = null;
   }
 
   editRequest(request: any): void {

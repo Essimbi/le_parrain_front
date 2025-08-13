@@ -25,37 +25,37 @@ export class OrderService {
   // Corresponds to: path('opened/', OrdersOpenedTodayView.as_view(), name='orders-opened')
   getOpenedOrders(): Observable<Order[]> {
     const headers = this.getAuthHeaders() ;
-    return this.http.get<Order[]>(`${this.apiUrl}/preparing/`, {headers}); //
+    return this.http.get<Order[]>(`${this.apiUrl}/preparing`, {headers}); //
   }
 
   getServedOrders(): Observable<Order[]> {
     const headers = this.getAuthHeaders() ;
-    return this.http.get<Order[]>(`${this.apiUrl}/served/`, {headers}); //
+    return this.http.get<Order[]>(`${this.apiUrl}/served`, {headers}); //
   }
 
   // Retrieves global daily revenue metrics (for barman/admin)
   // Corresponds to: path('barman/revenue/global/', GlobalDailyRevenueView.as_view(), name='global-daily-revenue')
   getGlobalDailyRevenue(): Observable<CashMetrics> {
     const headers = this.getAuthHeaders() ;
-    return this.http.get<CashMetrics>(`${this.apiUrl}/barman/revenue/global/`, {headers}); //
+    return this.http.get<CashMetrics>(`${this.apiUrl}/barman/revenue/global`, {headers}); //
   }
 
   // Retrieves daily revenue metrics for a specific serveur
   // Corresponds to: path('server/revenue/', DailyRevenueView.as_view(), name='orders-daily-revenue')
   getDailyRevenueForServeur(): Observable<any> { // Using 'any' as the backend response type is not strictly defined here
     const headers = this.getAuthHeaders() ;
-    return this.http.get<any>(`${this.apiUrl}/server/revenue/`, {headers}); //
+    return this.http.get<any>(`${this.apiUrl}/server/revenue`, {headers}); //
   }
 
   validedOrders(id: string): Observable<Order> {
     const headers = this.getAuthHeaders() ; 
-    const endpoint = `${this.apiUrl}/${id}/validate/`;
+    const endpoint = `${this.apiUrl}/${id}/validate`;
     return this.http.put<Order>(endpoint, { status: "servie" }, {headers});
   }
 
   closedOrder(id: string, data: any): Observable<Order> {
     const headers = this.getAuthHeaders() ;
-    const endpoint = `${this.apiUrl}/${id}/close/`;
+    const endpoint = `${this.apiUrl}/${id}/close`;
     return this.http.put<Order>(endpoint, data, {headers});
   }
 
@@ -65,9 +65,9 @@ export class OrderService {
   // - path('<uuid:pk>/validate/', OrderValidateView.as_view(), name='order-validate')
   updateOrderStatus(orderId: string, newStatus: 'ouverte' | 'servie' | 'fermée'): Observable<Order> {
     const headers = this.getAuthHeaders() ;
-    let endpoint = `${this.apiUrl}/${orderId}/update/`; // Default for 'update' action
+    let endpoint = `${this.apiUrl}/${orderId}/update`; // Default for 'update' action
     if (newStatus === 'servie') {
-      endpoint = `${this.apiUrl}/${orderId}/validate/`; // Specific for 'validate' (barman)
+      endpoint = `${this.apiUrl}/${orderId}/validate`; // Specific for 'validate' (barman)
     }
     return this.http.patch<Order>(endpoint, { status: newStatus }, {headers});
   }
@@ -76,7 +76,7 @@ export class OrderService {
   // Re-uses the OrderStatusUpdateView to set status to 'fermée' and record payment_type
   closeOrder(orderId: string, paymentType: 'cash' | 'mobile_money'): Observable<Order> {
     const headers = this.getAuthHeaders() ;
-    return this.http.patch<Order>(`${this.apiUrl}/${orderId}/update/`, { //
+    return this.http.patch<Order>(`${this.apiUrl}/${orderId}/update`, { //
       status: 'fermee', //
       payment_type: paymentType //
     }, {headers});

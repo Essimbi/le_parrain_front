@@ -26,19 +26,19 @@ export class ReplenishmentService {
   // Récupère toutes les demandes de réapprovisionnement (StockRequestListCreateView)
   getReplenishmentRequests(): Observable<any> {
     const headers = this.getAuthHeaders();
-    return this.http.get<any>(`${this.replenishmentApiUrl}/`, {headers});
+    return this.http.get<any>(`https://le-parrain.mbotchakfoundation.org/api/stock-requests`, {headers});
   }
 
   // Crée une nouvelle demande de réapprovisionnement (StockRequestListCreateView)
   createReplenishmentRequest(payload: any): Observable<any> {
     const headers = this.getAuthHeaders();
-    return this.http.post<any>(`${this.replenishmentApiUrl}/`, payload, {headers});
+    return this.http.post<any>(`https://le-parrain.mbotchakfoundation.org/api/stock-requests`, payload, {headers});
   }
 
   
   cancelReplenishmentRequest(requestId: string): Observable<any> {
     const headers = this.getAuthHeaders();
-    return this.http.delete(`${this.replenishmentApiUrl}/${requestId}/`, {headers});
+    return this.http.delete(`${this.replenishmentApiUrl}/${requestId}`, {headers});
     // Si l'annulation est un changement de statut à 'rejete' (nécessite un endpoint PATCH générique pour StockRequest):
     // return this.http.patch(`${this.replenishmentApiUrl}/${requestId}/`, { status: 'rejete' });
   }
@@ -46,14 +46,14 @@ export class ReplenishmentService {
   // Récupère les produits en stock critique (ProductBelowThresholdView)
   getUrgentProducts(): Observable<any> {
     const headers = this.getAuthHeaders();
-    return this.http.get<any>(`${this.productsApiUrl}/products/low-stock/`, {headers});
+    return this.http.get<any>(`${this.productsApiUrl}/stock/below-threshold`, {headers});
   }
 
   // Future API: Récupérer les métriques de réapprovisionnement (nécessitera une nouvelle vue API dans Django)
   // Pour l'instant, ces métriques seront calculées côté frontend ou attendront une API dédiée.
   getReplenishmentMetrics(): Observable<ReplenishmentMetrics> {
     const headers = this.getAuthHeaders();
-    return this.http.get<ReplenishmentMetrics>(`${this.productsApiUrl}/stock-requests/metrics/`, {headers});
+    return this.http.get<ReplenishmentMetrics>(`${this.productsApiUrl}/stock-requests/metrics`, {headers});
   }
 
   getMetrics(): Observable<{ data: any }> {
