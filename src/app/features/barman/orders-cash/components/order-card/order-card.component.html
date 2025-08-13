@@ -9,7 +9,7 @@
   <div class="order-details">
     <div class="order-info">
       <span><strong>Serveur:</strong> {{ order.serveurName }}</span>
-      <span><strong>Table:</strong> {{ order.tableNumber }}</span>
+      <!-- <span><strong>Table:</strong> {{ order.tableNumber }}</span> -->
     </div>
     <div class="order-info">
       <span><strong>Clients:</strong> {{ order.number_of_customers }} {{ order.number_of_customers > 1 ? 'personnes' : 'personne' }}</span>
@@ -43,12 +43,12 @@
         </span>
         <span>Terminer</span>
       </button>
-      <button class="button is-success is-small" (click)="processPayment()">
+      <!-- <button class="button is-success is-small" (click)="processPayment()">
         <span class="icon">
           <span class="emoji">💰</span>
         </span>
         <span>Encaisser</span>
-      </button>
+      </button> -->
     }
   </div>
 </div>

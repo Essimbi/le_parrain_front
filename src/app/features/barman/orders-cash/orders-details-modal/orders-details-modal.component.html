@@ -1,7 +1,7 @@
 <div class="modal-backdrop" (click)="onClose()"></div>
 <div class="modal">
   <div class="modal-header">
-    <h2 class="modal-title">Détails de la Commande {{ order?.id }}</h2>
+    <h2 class="modal-title">Détails de la Commande</h2> &nbsp; &nbsp;
     <button class="close-button" (click)="onClose()">✕</button>
   </div>
   <div class="modal-body">
@@ -9,7 +9,7 @@
       <div class="order-details">
         <p><strong>Statut:</strong> {{ order.status === 'ouverte' ? 'Ouverte' : order.status === 'servie' ? 'En préparation' : 'Fermée' }}</p>
         <p><strong>Serveur:</strong> {{ order.serveurName || 'Non spécifié' }}</p>
-        <p><strong>Table:</strong> {{ order.tableNumber || 'Non spécifié' }}</p>
+        <!-- <p><strong>Table:</strong> {{ order.tableNumber || 'Non spécifié' }}</p> -->
         <p><strong>Nombre de clients:</strong> {{ order.number_of_customers }}</p>
         <p><strong>Heure de commande:</strong> {{ getTimeAgo(order.created_at) }}</p>
         <p><strong>Total:</strong> {{ order.total_amount | number:'1.0-0' }} FCFA</p>

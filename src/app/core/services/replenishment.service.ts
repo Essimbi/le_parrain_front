@@ -10,8 +10,8 @@ import { Product } from '../models/product.model';
   providedIn: 'root'
 })
 export class ReplenishmentService {
-  private replenishmentApiUrl = 'http://127.0.0.1:8000/api/products/stock-requests'; // Endpoint pour StockRequest
-  private productsApiUrl = 'http://127.0.0.1:8000/api/products'; // Endpoint pour Product (pour les produits urgents)
+  private replenishmentApiUrl = 'https://le-parrain.mbotchakfoundation.org/api/products/stock-requests'; // Endpoint pour StockRequest
+  private productsApiUrl = 'https://le-parrain.mbotchakfoundation.org/api/products'; // Endpoint pour Product (pour les produits urgents)
 
   constructor(private http: HttpClient) { }
 
@@ -22,16 +22,17 @@ export class ReplenishmentService {
     });
   }
 
+
   // Récupère toutes les demandes de réapprovisionnement (StockRequestListCreateView)
-  getReplenishmentRequests(): Observable<ReplenishmentRequest[]> {
+  getReplenishmentRequests(): Observable<any> {
     const headers = this.getAuthHeaders();
-    return this.http.get<ReplenishmentRequest[]>(`${this.replenishmentApiUrl}/`, {headers});
+    return this.http.get<any>(`${this.replenishmentApiUrl}/`, {headers});
   }
 
   // Crée une nouvelle demande de réapprovisionnement (StockRequestListCreateView)
-  createReplenishmentRequest(payload: NewReplenishmentRequestPayload): Observable<ReplenishmentRequest> {
+  createReplenishmentRequest(payload: any): Observable<any> {
     const headers = this.getAuthHeaders();
-    return this.http.post<ReplenishmentRequest>(`${this.replenishmentApiUrl}/`, payload, {headers});
+    return this.http.post<any>(`${this.replenishmentApiUrl}/`, payload, {headers});
   }
 
   
@@ -43,9 +44,9 @@ export class ReplenishmentService {
   }
 
   // Récupère les produits en stock critique (ProductBelowThresholdView)
-  getUrgentProducts(): Observable<Product[]> {
+  getUrgentProducts(): Observable<any> {
     const headers = this.getAuthHeaders();
-    return this.http.get<Product[]>(`${this.productsApiUrl}/products/low-stock/`, {headers});
+    return this.http.get<any>(`${this.productsApiUrl}/products/low-stock/`, {headers});
   }
 
   // Future API: Récupérer les métriques de réapprovisionnement (nécessitera une nouvelle vue API dans Django)
@@ -53,5 +54,10 @@ export class ReplenishmentService {
   getReplenishmentMetrics(): Observable<ReplenishmentMetrics> {
     const headers = this.getAuthHeaders();
     return this.http.get<ReplenishmentMetrics>(`${this.productsApiUrl}/stock-requests/metrics/`, {headers});
+  }
+
+  getMetrics(): Observable<{ data: any }> {
+    // Cet endpoint est un exemple, vous devrez peut-être le modifier
+    return this.http.get<{ data: any }>(`${this.replenishmentApiUrl}/metrics`, { headers: this.getAuthHeaders() });
   }
 }

@@ -1,126 +1,287 @@
+/* --- Variables SCSS --- */
+$primary: #3273dc;
+$primary-light: #eff3fe;
+$info: #209cee;
+$info-light: #eef7fe;
+$success: #23d160;
+$success-light: #eefcf3;
+$danger: #ff3860;
+$danger-light: #feeeef;
+$warning: #ffdd57;
+$warning-light: #fffcf5;
+$grey: #7a7a7a;
+$light-grey: #dbdbdb;
+$dark-grey: #4a4a4a;
+$white: #ffffff;
+$link: #3273dc;
+$link-light: #eff3fe; // Nouvelle variable ajoutée
+
+/* --- Base et mise en page --- */
 .orders-cash-page {
   max-width: 1400px;
   margin: 0 auto;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  padding: 1rem;
 }
 
 .page-header {
   margin-bottom: 2rem;
   padding: 1.5rem;
-  background: white;
+  background-color: $white;
   border-radius: 12px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-  border-left: 5px solid #e74c3c;
+  border-left: 5px solid $link;
+
+  h1 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: $primary;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    font-size: 1rem;
+    color: $grey;
+  }
+}
+
+/* --- Cartes de métriques --- */
+.metrics-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.metric-card-container {
+  flex: 1 1 20%;
+  min-width: 250px;
 }
 
 .metric-card {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  padding: 1.5rem;
+  
   &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
   }
 
-  .card-content {
-    padding: 1.5rem;
-  }
+  &.primary-bg { background-color: $primary-light; }
+  &.info-bg { background-color: $info-light; }
+  &.success-bg { background-color: $success-light; }
+  &.link-bg { background-color: $link-light; }
 
   .heading {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: #7f8c8d;
     margin-bottom: 0.5rem;
+  }
+
+  .title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  
+  .subtitle {
+    font-size: 0.8rem;
+    color: $warning;
+  }
+
+  &.primary-bg .heading, &.primary-bg .title { color: $primary; }
+  &.info-bg .heading, &.info-bg .title { color: $info; }
+  &.success-bg .heading, &.success-bg .title { color: $success; }
+  &.link-bg .heading, &.link-bg .title { color: $link; }
+}
+
+/* --- Section principale des commandes --- */
+.orders-main-section {
+  position: relative;
+}
+
+.tab-bar {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid $light-grey;
+  
+  .tab-item {
+    padding: 0.75rem 1.5rem;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    font-weight: 600;
+    color: $grey;
+    transition: all 0.3s ease;
+
+    &:hover {
+      border-bottom-color: darken($light-grey, 10%);
+      color: $dark-grey;
+    }
+
+    &.active {
+      border-bottom-color: $link;
+      color: $link;
+    }
   }
 }
 
-.orders-section {
+.orders-section-container {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.orders-column {
+  flex: 1;
+  width: 50%;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.1);
   height: 600px;
   display: flex;
   flex-direction: column;
+  position: relative;
+  overflow: hidden;
 
-  .card-header {
-    border-radius: 12px 12px 0 0;
-    
-    .card-header-title {
-      font-weight: 600;
-      font-size: 1rem;
-    }
+  .header-title {
+    padding: 1rem;
+    color: $white;
+    font-weight: 600;
+    font-size: 1.1rem;
   }
 
-  .card-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-  }
+  &.danger-header { background-color: $danger; }
+  &.warning-header { background-color: $warning; }
 }
 
 .orders-container {
   flex: 1;
   overflow-y: auto;
   max-height: 520px;
+  padding: 1rem;
+  background-color: $white;
 
   &::-webkit-scrollbar {
     width: 6px;
   }
 
   &::-webkit-scrollbar-track {
-    background: #f1f1f1;
+    background-color: #f1f1f1;
   }
 
   &::-webkit-scrollbar-thumb {
-    background: #bdc3c7;
+    background-color: #bdc3c7;
     border-radius: 3px;
   }
+}
 
-  &::-webkit-scrollbar-thumb:hover {
-    background: #95a5a6;
+/* --- Loader et états vides --- */
+.loader-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  border-radius: 12px;
+}
+
+.loader {
+  border: 4px solid $light-grey;
+  border-top: 4px solid $link;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  text-align: center;
+  padding: 2rem;
+  
+  .emoji { font-size: 4rem; }
+  p {
+    font-size: 1rem;
+    color: $grey;
+    margin-top: 1rem;
   }
 }
 
-// Responsive
-@media (max-width: 1024px) {
-  .columns {
+/* --- Responsive Design --- */
+.desktop-hidden {
+  display: none;
+}
+
+.mobile-hidden {
+  display: block;
+}
+
+@media screen and (max-width: 1023px) {
+  .metric-card-container {
+    flex: 1 1 45%;
+    min-width: unset;
+  }
+
+  .orders-section-container {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .orders-column {
+    width: 100%;
+    margin-bottom: 1.5rem;
+    height: 500px;
+  }
+  
+  .orders-container {
+    max-height: 420px;
+  }
+  
+  .desktop-hidden {
     display: block;
-    
-    .column {
-      width: 100% !important;
-      margin-bottom: 1rem;
-    }
   }
   
-  .orders-section {
-    height: 400px;
-    
-    .orders-container {
-      max-height: 320px;
-    }
+  .mobile-hidden {
+    display: none;
   }
 }
 
-@media (max-width: 768px) {
-  .orders-cash-page {
-    padding: 0 10px;
-  }
-  
+@media screen and (max-width: 768px) {
   .page-header {
     padding: 1rem;
     margin-bottom: 1rem;
   }
-  
-  .metric-card .card-content {
+  .metric-card {
     padding: 1rem;
-  }
-  
-  .orders-section {
-    height: 350px;
-    
-    .orders-container {
-      max-height: 270px;
+    .title {
+      font-size: 1.25rem;
     }
+  }
+  .orders-column {
+    height: 400px;
+    .orders-container {
+      max-height: 320px;
+    }
+  }
+  .metric-card-container {
+    flex: 1 1 100%;
   }
 }

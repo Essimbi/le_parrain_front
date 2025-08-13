@@ -2,8 +2,9 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { OrderCardComponent } from './components/order-card/order-card.component';
 import { PaymentModalComponent } from './components/payment-modal/payment-modal.component';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, forkJoin, interval, switchMap, startWith } from 'rxjs';
 import { OrdersDetailsModalComponent } from './orders-details-modal/orders-details-modal.component';
+import { OrderService } from '../../../core/services/order.service';
 
 export interface Product {
   id: string;
@@ -34,6 +35,8 @@ export interface CashMetrics {
   date: string;
   total_revenue: number;
   total_closed_orders: number;
+  mobile_money_payments?: number;
+  cash_payments?: number;
 }
 
 interface PaymentData {
@@ -52,94 +55,20 @@ interface PaymentData {
 })
 export class OrdersCashComponent implements OnInit, OnDestroy {
   cashMetrics: CashMetrics & { cashPayments: number; mobileMoneyPayments: number; pendingOrders: number; ordersServed: number } = {
-    date: '2025-08-09',
-    total_revenue: 350000,
-    total_closed_orders: 25,
-    cashPayments: 200000,
-    mobileMoneyPayments: 150000,
-    pendingOrders: 8,
-    ordersServed: 22
+    date: '',
+    total_revenue: 0,
+    total_closed_orders: 0,
+    cashPayments: 0,
+    mobileMoneyPayments: 0,
+    pendingOrders: 0,
+    ordersServed: 0
   };
 
-  newOrders: Order[] = [
-    {
-      id: 'order1',
-      number_of_customers: 2,
-      status: 'ouverte',
-      total_amount: 3500,
-      payment_type: null,
-      created_at: '2025-08-09T18:10:00Z',
-      closed_at: null,
-      items: [
-        { product: 'Bière Mutzig', quantity: 2, unit_price: 1500 },
-        { product: 'Jus de Tamarin', quantity: 1, unit_price: 500 }
-      ],
-      serveurName: 'Jean',
-      tableNumber: 1
-    },
-    {
-      id: 'order2',
-      number_of_customers: 3,
-      status: 'ouverte',
-      total_amount: 5000,
-      payment_type: null,
-      created_at: '2025-08-09T18:25:00Z',
-      closed_at: null,
-      items: [
-        { product: 'Bière 33 Export', quantity: 3, unit_price: 1500 },
-        { product: 'Jus de Bissap', quantity: 1, unit_price: 500 }
-      ],
-      serveurName: 'Aissatou',
-      tableNumber: 2
-    },
-    {
-      id: 'order5',
-      number_of_customers: 4,
-      status: 'ouverte',
-      total_amount: 6000,
-      payment_type: null,
-      created_at: '2025-08-09T19:00:00Z',
-      closed_at: null,
-      items: [
-        { product: 'Jus de Gingembre', quantity: 4, unit_price: 1000 },
-        { product: 'Bière Beaufort', quantity: 1, unit_price: 2000 }
-      ],
-      serveurName: 'Marie',
-      tableNumber: 5
-    },
-  ];
-
-  preparingOrders: Order[] = [
-    {
-      id: 'order3',
-      number_of_customers: 1,
-      status: 'servie',
-      total_amount: 1500,
-      payment_type: null,
-      created_at: '2025-08-09T18:00:00Z',
-      closed_at: null,
-      items: [
-        { product: 'Bière Beaufort', quantity: 1, unit_price: 1500 }
-      ],
-      serveurName: 'Pierre',
-      tableNumber: 3
-    },
-    {
-      id: 'order4',
-      number_of_customers: 4,
-      status: 'servie',
-      total_amount: 8000,
-      payment_type: null,
-      created_at: '2025-08-09T18:15:00Z',
-      closed_at: null,
-      items: [
-        { product: 'Bière Heineken', quantity: 4, unit_price: 2000 }
-      ],
-      serveurName: 'Martine',
-      tableNumber: 4
-    },
-  ];
-
+  newOrders: Order[] = [];
+  preparingOrders: Order[] = [];
+  isLoading = true;
+  activeTab: 'new' | 'preparing' = 'new';
+  
   showPaymentModal = false;
   selectedOrderForPayment: Order | null = null;
   showDetailsModal = false;
@@ -148,19 +77,75 @@ export class OrdersCashComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   public userRole: 'barman' | 'admin' | 'serveur' = 'serveur';
 
-  constructor() {}
+  constructor(public orderService: OrderService) {}
 
   ngOnInit() {
-    this.loadOrdersAndMetrics();
+    this.loadInitialData();
   }
 
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
   }
+  
+  private loadInitialData(): void {
+    forkJoin({
+      metrics: this.orderService.getGlobalDailyRevenue(),
+      newOrders: this.orderService.getOpenedOrders(),
+      preparingOrders: this.orderService.getServedOrders()
+    }).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (results: any) => {
+        this.updateData(results);
+        this.isLoading = false;
+        this.startAutoRefresh();
+      },
+      error: (err) => {
+        console.error('Error loading initial data', err);
+        this.isLoading = false;
+        this.showNotification('Échec du chargement initial des commandes et métriques.', 'warning');
+      }
+    });
+  }
 
-  private loadOrdersAndMetrics(): void {
+  private startAutoRefresh(): void {
+    interval(5000)
+      .pipe(
+        switchMap(() => {
+          return forkJoin({
+            metrics: this.orderService.getGlobalDailyRevenue(),
+            newOrders: this.orderService.getOpenedOrders(),
+            preparingOrders: this.orderService.getServedOrders()
+          });
+        }),
+        takeUntil(this.destroy$)
+      )
+      .subscribe({
+        next: (results: any) => {
+          this.updateData(results);
+        },
+        error: (err) => {
+          console.error('Error during auto-refresh', err);
+          this.showNotification('Échec du rafraîchissement des données.', 'warning');
+        }
+      });
+  }
+
+  private updateData(results: any): void {
+    this.cashMetrics = {
+      ...this.cashMetrics,
+      ...results.metrics,
+      total_revenue: results.metrics.total_revenue || 0,
+      ordersServed: results.metrics.total_closed_orders || 0,
+      mobileMoneyPayments: results.metrics.mobile_money_payments || 0,
+      cashPayments: results.metrics.cash_payments || 0,
+    };
+    this.newOrders = results.newOrders.data;
+    this.preparingOrders = results.preparingOrders.data;
     this.cashMetrics.pendingOrders = this.newOrders.length + this.preparingOrders.length;
+  }
+
+  setActiveTab(tab: 'new' | 'preparing'): void {
+    this.activeTab = tab;
   }
 
   onPrepareOrder(orderId: string) {
@@ -169,21 +154,28 @@ export class OrdersCashComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const orderIndex = this.newOrders.findIndex(order => order.id === orderId);
-    if (orderIndex !== -1) {
-      const order = { ...this.newOrders[orderIndex], status: 'servie' as 'servie' };
-      this.newOrders.splice(orderIndex, 1);
-      this.preparingOrders.push(order);
-      this.cashMetrics.pendingOrders = this.newOrders.length + this.preparingOrders.length;
-      this.showNotification(`Commande ${order.id} mise en préparation`, 'success');
-      this.closeDetailsModal();
-    }
+    this.orderService.validedOrders(orderId).subscribe({
+      next: (validatedOrder) => {
+        const orderIndex = this.newOrders.findIndex(order => order.id === orderId);
+        if (orderIndex !== -1) {
+          this.newOrders.splice(orderIndex, 1);
+          this.preparingOrders.push(validatedOrder);
+          this.cashMetrics.pendingOrders = this.newOrders.length + this.preparingOrders.length;
+          // this.showNotification(`Commande ${validatedOrder.id} mise en préparation`, 'success');
+          this.closeDetailsModal();
+        }
+      },
+      error: (err) => {
+        console.error('Error validating order', err);
+        this.showNotification('Échec de la préparation de la commande.', 'warning');
+      }
+    });
   }
 
   onFinishOrder(orderId: string) {
     const order = this.preparingOrders.find(o => o.id === orderId);
     if (order) {
-      this.showNotification(`Commande ${order.id} prête à être payée`, 'info');
+      // this.showNotification(`Commande ${order.id} prête à être payée`, 'info');
       this.onProcessPayment(orderId);
     }
   }
@@ -193,6 +185,7 @@ export class OrdersCashComponent implements OnInit, OnDestroy {
     if (order) {
       this.selectedOrderForPayment = order;
       this.showPaymentModal = true;
+      // console.log(order)
       this.closeDetailsModal();
     }
   }
@@ -208,27 +201,44 @@ export class OrdersCashComponent implements OnInit, OnDestroy {
   onPaymentComplete(paymentData: PaymentData) {
     const order = this.selectedOrderForPayment;
     if (order) {
-      const updatedOrder: Order = { ...order, status: 'fermée', closed_at: new Date().toISOString(), payment_type: paymentData.paymentType };
-      this.cashMetrics.total_revenue += updatedOrder.total_amount;
-      this.cashMetrics.ordersServed++;
-      if (paymentData.paymentType === 'cash') {
-        this.cashMetrics.cashPayments += updatedOrder.total_amount;
-      } else {
-        this.cashMetrics.mobileMoneyPayments += updatedOrder.total_amount;
-      }
+      // Préparation des données pour l'appel API
+      const data = {
+        status: 'fermée',
+        payment_type: paymentData.paymentType
+      };
 
-      const orderIndex = this.preparingOrders.findIndex(o => o.id === order.id);
-      if (orderIndex !== -1) {
-        this.preparingOrders.splice(orderIndex, 1);
-      }
-      this.cashMetrics.pendingOrders = Math.max(0, this.newOrders.length + this.preparingOrders.length);
+      // Utilisation du service pour valider le paiement via l'API
+      this.orderService.closedOrder(order.id, data).subscribe({
+        next: (closedOrder) => {
+          // Mise à jour de l'interface après une validation réussie
+          const orderIndex = this.preparingOrders.findIndex(o => o.id === closedOrder.id);
+          if (orderIndex !== -1) {
+            this.preparingOrders.splice(orderIndex, 1);
+          }
 
-      this.showNotification(`Paiement confirmé pour ${updatedOrder.id} (${paymentData.paymentType})`, 'success');
-      this.closePaymentModal();
+          // Mise à jour des métriques de la caisse
+          this.cashMetrics.total_revenue += closedOrder.total_amount;
+          this.cashMetrics.ordersServed++;
+          if (closedOrder.payment_type === 'cash') {
+            this.cashMetrics.cashPayments += closedOrder.total_amount;
+          } else {
+            this.cashMetrics.mobileMoneyPayments += closedOrder.total_amount;
+          }
+          this.cashMetrics.pendingOrders = Math.max(0, this.newOrders.length + this.preparingOrders.length);
+
+          // this.showNotification(`Paiement confirmé pour ${closedOrder.id} (${closedOrder.payment_type})`, 'success');
+          this.closePaymentModal();
+        },
+        error: (err) => {
+          console.error('Error closing order:', err);
+          this.showNotification('Échec de la confirmation du paiement.', 'warning');
+        }
+      });
     } else {
       this.closePaymentModal();
     }
   }
+
 
   closePaymentModal() {
     this.showPaymentModal = false;
@@ -246,7 +256,7 @@ export class OrdersCashComponent implements OnInit, OnDestroy {
 
   getTimeAgo(dateString: string): string {
     const date = new Date(dateString);
-    const now = new Date('2025-08-09T23:59:00Z');
+    const now = new Date();
     const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
 
     if (isNaN(diffInMinutes)) return 'Date invalide';

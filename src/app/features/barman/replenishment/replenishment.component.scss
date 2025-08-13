@@ -1,318 +1,467 @@
+/* --- Variables de couleurs SCSS --- */
+$primary: #34495e;
+$primary-light: #eff3f6;
+$accent: #3498db;
+$accent-light: #e6f2fa;
+$success: #2ecc71;
+$success-light: #ecf9f1;
+$danger: #e74c3c;
+$danger-light: #fef0ef;
+$warning: #f39c12;
+$warning-light: #fff7e6;
+$grey: #95a5a6;
+$light-grey: #ecf0f1;
+$dark-grey: #2c3e50;
+$white: #ffffff;
+
+/* --- Général et Mise en page --- */
 .replenishment-page {
+  padding: 1.5rem;
   max-width: 1400px;
   margin: 0 auto;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
 }
 
 .page-header {
   margin-bottom: 2rem;
   padding: 1.5rem;
-  background: white;
+  background-color: $white;
   border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-  border-left: 5px solid #e74c3c;
-}
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  border-left: 5px solid $accent;
 
-.metric-card {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-
-  &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-  }
-
-  &.critical {
-    border-left: 4px solid #e74c3c;
-    
-    &:hover {
-      box-shadow: 0 8px 25px rgba(231,76,60,0.2);
-    }
-  }
-
-  .card-content {
-    padding: 1.5rem;
-  }
-
-  .heading {
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: #7f8c8d;
+  .title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: $primary;
     margin-bottom: 0.5rem;
   }
 
-  .emoji {
-    font-size: 2rem;
+  .subtitle {
+    font-size: 1rem;
+    color: $grey;
   }
 }
 
+/* --- Grille des métriques --- */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.metric-card {
+  background-color: $white;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  }
+
+  &.critical {
+    background-color: $danger-light;
+    border-left: 4px solid $danger;
+  }
+  
+  &.pending {
+    background-color: $warning-light;
+    border-left: 4px solid $warning;
+  }
+  
+  &.approved {
+    background-color: $success-light;
+    border-left: 4px solid $success;
+  }
+  
+  .content {
+    .heading {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: $grey;
+      margin-bottom: 0.25rem;
+    }
+    
+    .title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: $primary;
+      line-height: 1.2;
+    }
+
+    .subtitle {
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    &.pending .heading, &.pending .title, &.pending .subtitle { color: $warning; }
+    &.approved .heading, &.approved .title, &.approved .subtitle { color: $success; }
+    &.critical .heading, &.critical .title, &.critical .subtitle { color: $danger; }
+  }
+
+  .icon-container {
+    font-size: 2.5rem;
+    line-height: 1;
+    color: $grey;
+    
+    &.accent { color: $accent; }
+    &.danger { color: $danger; }
+    &.success { color: $success; }
+    &.warning { color: $warning; }
+  }
+}
+
+/* --- Boutons d'action --- */
 .action-buttons {
   display: flex;
   gap: 1rem;
-  justify-content: center;
-
+  margin-bottom: 2rem;
+  
   .button {
     border-radius: 8px;
     font-weight: 600;
+    padding: 0.75rem 1.5rem;
     transition: all 0.3s ease;
 
     &:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
+  }
+  
+  .add-button {
+    background-color: $accent;
+    color: $white;
+    border: none;
+    
+    &:hover { background-color: lighten($accent, 5%); }
+  }
+  
+  .urgent-button {
+    background-color: $danger;
+    color: $white;
+    border: none;
+    
+    &:hover { background-color: lighten($danger, 5%); }
+  }
+}
 
-    .emoji {
-      font-size: 1.2rem;
+/* --- Conteneur du tableau et des contrôles --- */
+.requests-history-container {
+  background-color: $white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.table-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  align-items: center;
+
+  .search-bar {
+    flex-grow: 1;
+    min-width: 200px;
+    padding: 0.75rem 1rem;
+    border: 1px solid $light-grey;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+    
+    &:focus {
+      outline: none;
+      border-color: $accent;
+    }
+  }
+  
+  .filter-select {
+    padding: 0.75rem 1rem;
+    border: 1px solid $light-grey;
+    border-radius: 8px;
+    background-color: $white;
+    font-size: 1rem;
+    color: $primary;
+    appearance: none;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2395a5a6%22%20d%3D%22M287%20165.7l-123.6-123.6c-4.7-4.7-12.3-4.7-17%200L5.4%20165.7c-4.7%204.7-4.7%2012.3%200%2017l14.3%2014.3c4.7%204.7%2012.3%204.7%2017%200l93.2-93.2c4.7-4.7%2012.3-4.7%2017%200l93.2%2093.2c4.7%204.7%2012.3%204.7%2017%200l14.3-14.3c4.7-4.7%204.7-12.3%200-17z%22%2F%3E%3C%2Fsvg%3E');
+    background-repeat: no-repeat;
+    background-position: right 0.7rem center;
+    background-size: 10px;
+    cursor: pointer;
+    
+    &:focus {
+      outline: none;
+      border-color: $accent;
     }
   }
 }
 
-.form-section {
-  background: white;
-  border-radius: 12px;
-  padding: 2rem;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-  border-left: 5px solid #3498db;
-}
+/* --- Tableau des produits --- */
+.requests-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
 
-.requests-history {
-  .card {
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    overflow: hidden;
+  th, td {
+    text-align: left;
+    padding: 1rem;
+    border-bottom: 1px solid $light-grey;
   }
 
-  .card-header {
-    background: linear-gradient(135deg, #3498db, #2980b9);
-    color: white;
-    padding: 1.5rem;
-
-    .card-header-title {
-      color: white;
+  thead {
+    th {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      color: $grey;
       font-weight: 600;
-      font-size: 1.1rem;
+    }
+  }
 
-      .emoji {
-        font-size: 1.3rem;
+  tbody {
+    tr {
+      transition: background-color 0.3s ease;
+      cursor: pointer;
+      
+      &:hover {
+        background-color: $primary-light;
+      }
+    }
+  }
+  
+  .status-cell {
+    span {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      line-height: 1;
+    }
+
+    &.status-approved span {
+      background-color: $success-light;
+      color: $success;
+    }
+    &.status-pending span {
+      background-color: $warning-light;
+      color: $warning;
+    }
+    &.status-rejected span {
+      background-color: $danger-light;
+      color: $danger;
+    }
+  }
+
+  .actions-cell {
+    .action-button {
+      background: none;
+      border: none;
+      font-size: 1.1rem;
+      cursor: pointer;
+      color: $grey;
+      margin-right: 0.5rem;
+      transition: color 0.3s ease;
+
+      &:hover {
+        color: $primary;
       }
     }
   }
 }
 
-.table-container {
-  overflow-x: auto;
-  max-height: 500px;
-  overflow-y: auto;
-
-  &::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: #f1f1f1;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: #bdc3c7;
-    border-radius: 3px;
-  }
-
-  &::-webkit-scrollbar-thumb:hover {
-    background: #95a5a6;
-  }
-}
-
-.table {
-  margin: 0;
-
-  th {
-    background: #f8f9fa;
-    font-weight: 600;
-    color: #2c3e50;
-    border-bottom: 2px solid #ecf0f1;
-    padding: 1rem;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  td {
-    padding: 1rem;
-    vertical-align: middle;
-    border-bottom: 1px solid #ecf0f1;
-  }
-
-  tbody tr {
-    transition: background 0.3s ease;
-
-    &:hover {
-      background: #f8f9fa;
-    }
-  }
-}
-
-.tag {
-  border-radius: 15px;
-  font-weight: 500;
-  font-size: 0.75rem;
-  padding: 0.5em 0.8em;
-
-  &.is-light {
-    background: #ecf0f1;
-    color: #2c3e50;
-  }
-}
-
-.buttons {
+/* --- Pagination --- */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   gap: 0.5rem;
 
-  .button {
-    border-radius: 6px;
-    transition: all 0.2s ease;
-
-    &:hover {
-      transform: scale(1.05);
-    }
-
-    .emoji {
-      font-size: 0.9rem;
-    }
-  }
-}
-
-// Modal styles
-.modal-card {
-  border-radius: 12px;
-  overflow: hidden;
-  max-width: 600px;
-  width: 90%;
-}
-
-.modal-card-head {
-  background: linear-gradient(135deg, #27ae60, #2ecc71);
-  color: white;
-  padding: 1.5rem;
-
-  .modal-card-title {
-    font-size: 1.2rem;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-
-    .emoji {
-      font-size: 1.4rem;
-    }
-  }
-
-  .delete {
-    background: rgba(255,255,255,0.2);
+  .page-link {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    border: 1px solid $light-grey;
+    color: $primary;
+    background-color: $white;
+    cursor: pointer;
+    transition: all 0.3s ease;
     
-    &:hover {
-      background: rgba(255,255,255,0.3);
+    &:hover:not(.active) {
+      background-color: $primary-light;
     }
 
-    &::before, &::after {
-      background-color: white;
+    &.active {
+      background-color: $accent;
+      border-color: $accent;
+      color: $white;
+      cursor: default;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
     }
   }
 }
 
-.modal-card-body {
+/* --- Loader et état vide --- */
+.loader-overlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4rem 0;
+  
+  .loader {
+    border: 4px solid $light-grey;
+    border-top: 4px solid $accent;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 0;
+  color: $grey;
+  
+  .emoji {
+    font-size: 4rem;
+  }
+}
+
+/* --- Modal Form --- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  
+  &.show {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+.modal-content {
+  background-color: $white;
   padding: 2rem;
-
-  .notification {
-    border-radius: 8px;
-    padding: 1rem;
-    margin-bottom: 1.5rem;
-
-    .icon {
-      margin-right: 0.5rem;
-    }
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 500px;
+  transform: translateY(-20px);
+  transition: transform 0.3s ease;
+  
+  .modal-overlay.show & {
+    transform: translateY(0);
   }
-
-  .field {
-    margin-bottom: 1.5rem;
-  }
-
-  .label {
-    font-weight: 600;
-    color: #2c3e50;
-    margin-bottom: 0.5rem;
-  }
-
-  .input, .textarea, .select select {
-    border-radius: 8px;
-    border: 2px solid #ecf0f1;
-    transition: border-color 0.3s ease;
-
-    &:focus {
-      border-color: #3498db;
-      box-shadow: 0 0 0 0.125em rgba(52, 152, 219, 0.25);
-    }
-  }
-}
-
-.modal-card-foot {
-  background: #f8f9fa;
-  padding: 1.5rem 2rem;
-  border-top: 1px solid #ecf0f1;
-
-  .button {
-    border-radius: 8px;
-    font-weight: 600;
-  }
-}
-
-// Empty state
-.emoji.large {
-  font-size: 3rem;
-}
-
-// Responsive
-@media (max-width: 1024px) {
-  .action-buttons {
-    flex-direction: column;
+  
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
     align-items: center;
+    border-bottom: 1px solid $light-grey;
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
 
-    .button {
-      width: 100%;
-      max-width: 300px;
+    .modal-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: $primary;
+    }
+    
+    .close-button {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: $grey;
+      transition: color 0.3s ease;
+      
+      &:hover { color: $danger; }
     }
   }
-}
-
-@media (max-width: 768px) {
-  .replenishment-page {
-    padding: 0 10px;
-  }
   
-  .page-header {
-    padding: 1rem;
-    margin-bottom: 1rem;
-  }
-  
-  .metric-card .card-content {
-    padding: 1rem;
+  .form-group {
+    margin-bottom: 1.5rem;
+
+    label {
+      display: block;
+      font-weight: 600;
+      color: $primary;
+      margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid $light-grey;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+      
+      &:focus {
+        outline: none;
+        border-color: $accent;
+      }
+    }
   }
 
-  .form-section {
-    padding: 1rem;
-  }
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
 
-  .table-container {
-    max-height: 400px;
-  }
-
-  .table th, .table td {
-    padding: 0.75rem 0.5rem;
-    font-size: 0.85rem;
-  }
-
-  .buttons {
-    flex-direction: column;
-    align-items: stretch;
+    .cancel-button {
+      background-color: $light-grey;
+      color: $primary;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      
+      &:hover { background-color: darken($light-grey, 5%); }
+    }
+    
+    .submit-button {
+      background-color: $accent;
+      color: $white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      
+      &:hover { background-color: darken($accent, 5%); }
+    }
   }
 }

@@ -10,7 +10,7 @@ import { CashMetrics, Order } from '../models/order.model';
 })
 export class OrderService {
   // Base API URL for your Django orders module
-  private apiUrl = 'http://127.0.0.1:8000/api/orders'; //
+  private apiUrl = 'https://le-parrain.mbotchakfoundation.org/api/orders'; //
 
   constructor(private http: HttpClient) { }
 
@@ -23,9 +23,14 @@ export class OrderService {
 
   // Retrieves orders that are 'ouverte' or 'servie' (opened today)
   // Corresponds to: path('opened/', OrdersOpenedTodayView.as_view(), name='orders-opened')
-  getOpenedOrServedOrders(): Observable<Order[]> {
+  getOpenedOrders(): Observable<Order[]> {
     const headers = this.getAuthHeaders() ;
-    return this.http.get<Order[]>(`${this.apiUrl}/opened/`, {headers}); //
+    return this.http.get<Order[]>(`${this.apiUrl}/preparing/`, {headers}); //
+  }
+
+  getServedOrders(): Observable<Order[]> {
+    const headers = this.getAuthHeaders() ;
+    return this.http.get<Order[]>(`${this.apiUrl}/served/`, {headers}); //
   }
 
   // Retrieves global daily revenue metrics (for barman/admin)
@@ -40,6 +45,18 @@ export class OrderService {
   getDailyRevenueForServeur(): Observable<any> { // Using 'any' as the backend response type is not strictly defined here
     const headers = this.getAuthHeaders() ;
     return this.http.get<any>(`${this.apiUrl}/server/revenue/`, {headers}); //
+  }
+
+  validedOrders(id: string): Observable<Order> {
+    const headers = this.getAuthHeaders() ; 
+    const endpoint = `${this.apiUrl}/${id}/validate/`;
+    return this.http.put<Order>(endpoint, { status: "servie" }, {headers});
+  }
+
+  closedOrder(id: string, data: any): Observable<Order> {
+    const headers = this.getAuthHeaders() ;
+    const endpoint = `${this.apiUrl}/${id}/close/`;
+    return this.http.put<Order>(endpoint, data, {headers});
   }
 
   // Updates the status of an order

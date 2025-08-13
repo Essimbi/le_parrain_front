@@ -1,243 +1,177 @@
 <div class="replenishment-page">
-  <div class="page-header">
-    <h1 class="title is-3 has-text-primary">Réapprovisionnement</h1>
-    <p class="subtitle is-6 has-text-grey">Créez et suivez vos demandes de réappro</p>
-  </div>
-
-  <div class="columns is-multiline mb-6">
-    <div class="column is-3">
-      <div class="card metric-card">
-        <div class="card-content">
-          <div class="level">
-            <div class="level-left">
-              <div>
-                <p class="heading">Demandes en Attente</p>
-                <p class="title is-4 has-text-warning">{{ metrics.pending_requests_count }}</p>
-                <p class="subtitle is-7">En cours de validation</p>
-              </div>
-            </div>
-            <div class="level-right">
-              <span class="icon is-large has-text-warning">
-                <span class="emoji">⏳</span>
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="column is-3">
-      <div class="card metric-card">
-        <div class="card-content">
-          <div class="level">
-            <div class="level-left">
-              <div>
-                <p class="heading">Dernière Livraison</p>
-                <p class="title is-5 has-text-success">{{ metrics.last_approved_request_date || 'N/A' }}</p>
-                <p class="subtitle is-7 has-text-success">{{ metrics.last_approved_request_quantity || 0 }} produits reçus</p>
-              </div>
-            </div>
-            <div class="level-right">
-              <span class="icon is-large has-text-success">
-                <span class="emoji">📦</span>
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="column is-3">
-      <div class="card metric-card critical">
-        <div class="card-content">
-          <div class="level">
-            <div class="level-left">
-              <div>
-                <p class="heading">Produits Urgents</p>
-                <p class="title is-4 has-text-danger">{{ metrics.critical_products_count }}</p>
-                <p class="subtitle is-7 has-text-danger">Stock < 5</p>
-              </div>
-            </div>
-            <div class="level-right">
-              <span class="icon is-large has-text-danger">
-                <span class="emoji">🚨</span>
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="column is-3">
-      <div class="card metric-card">
-        <div class="card-content">
-          <div class="level">
-            <div class="level-left">
-              <div>
-                <p class="heading">Prochaine Livraison</p>
-                <p class="title is-5 has-text-info">À définir</p>
-                <p class="subtitle is-7">Prévisionnel</p>
-              </div>
-            </div>
-            <div class="level-right">
-              <span class="icon is-large has-text-info">
-                <span class="emoji">🚛</span>
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="action-buttons mb-6">
-    <button class="button is-primary is-medium" (click)="openQuickReplenishModal()">
-      <span class="icon">
-        <span class="emoji">⚡</span>
-      </span>
-      <span>Demande Rapide</span>
+  <div class="action-buttons">
+    <button class="button add-button" (click)="openFormModal()">
+      <span class="emoji">✨</span>
+      <span>Créer une nouvelle demande</span>
     </button>
   </div>
+  
+  @if (isLoading) {
+    <div class="loader-overlay">
+      <div class="loader"></div>
+    </div>
+  } @else {
+    <div class="requests-history-container">
+      <div class="table-controls">
+        <input 
+          type="text" 
+          placeholder="Rechercher par ID ou produit..." 
+          class="search-bar" 
+          [(ngModel)]="searchTerm"
+          (input)="applyFilters()"
+        >
 
-  <div class="form-section mb-6">
-    <app-replenishment-form [urgentProducts]="urgentProducts" (onRequestSubmit)="onNewReplenishmentRequest($event)"></app-replenishment-form>
-  </div>
-
-  <div class="requests-history">
-    <div class="card">
-      <div class="card-header">
-        <p class="card-header-title">
-          <span class="icon mr-2">
-            <span class="emoji">📋</span>
-          </span>
-          Historique des Demandes
-        </p>
+        <select 
+          class="filter-select"
+          [(ngModel)]="selectedStatus"
+          (change)="applyFilters()"
+        >
+          <option value="all">Tous les statuts</option>
+          <option value="en_attente">En attente</option>
+          <option value="approuve">Approuvée</option>
+          <option value="rejete">Rejetée</option>
+        </select>
       </div>
-      <div class="card-content p-0">
-        <div class="table-container">
-          <table class="table is-fullwidth is-hoverable">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Date</th>
-                <th>Priorité</th>
-                <th>Statut</th>
-                <th>Articles</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngIf="requests.length === 0">
-                <td colspan="6" class="has-text-centered">Aucune demande trouvée</td>
-              </tr>
-              <tr *ngFor="let request of requests">
-                <td>{{ request.id }}</td>
-                <td>{{ formatDate(request.created_at) }}</td>
-                <td>
-                  <span class="tag" [ngClass]="getPriorityClass(request.priority)">
-                    {{ getPriorityText(request.priority) }}
-                  </span>
-                </td>
-                <td>
-                  <span class="tag" [ngClass]="getStatusClass(request.status)">
-                    {{ getStatusText(request.status) }}
-                  </span>
-                </td>
-                <td>{{ request.totalQuantity }} articles</td>
-                <td class="action-buttons">
-                  <button class="button is-small is-info is-light" (click)="openDetailsModal(request)">
-                    <span class="icon is-small">
-                      <span class="emoji">👀</span>
-                    </span>
-                  </button>
-                  <button
-                    class="button is-small is-warning is-light"
-                    *ngIf="request.status === 'en_attente'"
-                    (click)="openEditModal(request)">
-                    <span class="icon is-small">
-                      <span class="emoji">📝</span>
-                    </span>
-                  </button>
-                  <button
-                    class="button is-small is-danger is-light"
-                    *ngIf="request.status === 'en_attente'"
-                    (click)="cancelRequest(request.id)">
-                    <span class="icon is-small">
-                      <span class="emoji">❌</span>
-                    </span>
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+
+      <table class="requests-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Date de demande</th>
+            <th>Nombre de produits</th>
+            <th>Statut</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (request of paginatedRequests; track request.id) {
+            <tr (click)="openRequestDetails(request)">
+              <td>{{ request.id }}</td>
+              <td>{{ request.created_at | date: 'dd/MM/yyyy HH:mm' }}</td>
+              <td>{{ request.items.length }}</td>
+              <td class="status-cell" [class]="getStatusClass(request.status)">
+                <span>{{ getReadableStatus(request.status) }}</span>
+              </td>
+              <td class="actions-cell">
+                <button class="action-button" (click)="$event.stopPropagation(); editRequest(request)">
+                  <span class="emoji">✏️</span>
+                </button>
+                <button class="action-button" (click)="$event.stopPropagation(); deleteRequest(request.id)">
+                  <span class="emoji">🗑️</span>
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" class="empty-state-cell">
+                <div class="empty-state">
+                  <span class="emoji">🤷</span>
+                  <p>Aucune demande ne correspond à vos filtres.</p>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      @if (totalPages > 1) {
+        <div class="pagination">
+          <button 
+            class="page-link" 
+            [disabled]="currentPage === 1" 
+            (click)="onPageChange(currentPage - 1)">
+            Précédent
+          </button>
+          @for (page of [].constructor(totalPages); track $index) {
+            <button 
+              class="page-link" 
+              [class.active]="currentPage === $index + 1" 
+              (click)="onPageChange($index + 1)">
+              {{ $index + 1 }}
+            </button>
+          }
+          <button 
+            class="page-link" 
+            [disabled]="currentPage === totalPages" 
+            (click)="onPageChange(currentPage + 1)">
+            Suivant
+          </button>
         </div>
-      </div>
+      }
     </div>
-  </div>
+  }
+</div>
 
-  <div class="modal" [ngClass]="{'is-active': showDetailsModal}">
-    <div class="modal-background" (click)="closeDetailsModal()"></div>
-    <div class="modal-card">
-      <header class="modal-card-head">
-        <p class="modal-card-title">Détails de la demande {{ selectedRequest?.id }}</p>
-        <button class="delete" aria-label="close" (click)="closeDetailsModal()"></button>
-      </header>
-      <section class="modal-card-body" *ngIf="selectedRequest">
-        <p><strong>Date de la demande:</strong> {{ formatDateTime(selectedRequest.created_at) }}</p>
-        <p><strong>Statut:</strong> <span class="tag" [ngClass]="getStatusClass(selectedRequest.status)">{{ getStatusText(selectedRequest.status) }}</span></p>
-        <p><strong>Priorité:</strong> <span class="tag" [ngClass]="getPriorityClass(selectedRequest.priority)">{{ getPriorityText(selectedRequest.priority) }}</span></p>
-        <p><strong>Commentaire:</strong> {{ selectedRequest.comment || 'N/A' }}</p>
-        <br>
-        <h4 class="title is-5">Produits demandés :</h4>
-        <ul>
-          <li *ngFor="let item of selectedRequest.items">
-            - {{ item.product }}: {{ item.quantity }}
-          </li>
-        </ul>
-      </section>
-      <footer class="modal-card-foot">
-        <button class="button" (click)="closeDetailsModal()">Fermer</button>
-      </footer>
+<div class="modal-overlay" [class.show]="isFormModalOpen">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 class="modal-title">Créer une nouvelle demande</h2>
+      <button class="close-button" (click)="closeFormModal()">
+        <span class="emoji">❌</span>
+      </button>
     </div>
-  </div>
+    
+    <div class="modal-body">
+      <form (ngSubmit)="submitNewRequest()">
+        <div class="form-group">
+          <label for="product">Produit</label>
+          <select 
+            id="product" 
+            name="product" 
+            class="form-control" 
+            [(ngModel)]="newRequestForm.product_id"
+            required
+          >
+            <option value="" disabled>Sélectionner un produit</option>
+            @for (product of products; track product.id) {
+              <option [value]="product.id">{{ product.name }} (Stock: {{ product.stock_quantity }})</option>
+            }
+          </select>
+        </div>
 
-  <div class="modal" [ngClass]="{'is-active': showEditModal}">
-    <div class="modal-background" (click)="closeEditModal()"></div>
-    <div class="modal-card">
-      <header class="modal-card-head">
-        <p class="modal-card-title">Modifier la demande {{ editedRequest?.id }}</p>
-        <button class="delete" aria-label="close" (click)="closeEditModal()"></button>
-      </header>
-      <section class="modal-card-body" *ngIf="editedRequest">
-        <form (ngSubmit)="onEditSubmit()">
-          <div class="field">
-            <label class="label">Priorité</label>
-            <div class="control">
-              <div class="select is-fullwidth">
-                <select name="priority" [(ngModel)]="editedRequest.priority">
-                  <option value="normal">Normale</option>
-                  <option value="urgent">Urgente</option>
-                </select>
-              </div>
-            </div>
-          </div>
-          <div class="field">
-            <label class="label">Commentaire</label>
-            <div class="control">
-              <textarea
-                class="textarea"
-                name="comment"
-                placeholder="Ajouter un commentaire"
-                [(ngModel)]="editedRequest.comment">
-              </textarea>
-            </div>
-          </div>
-        </form>
-      </section>
-      <footer class="modal-card-foot">
-        <button class="button" (click)="closeEditModal()">Annuler</button>
-        <button class="button is-primary" (click)="onEditSubmit()">Sauvegarder</button>
-      </footer>
+        <div class="form-group">
+          <label for="quantity">Quantité demandée</label>
+          <input 
+            type="number" 
+            id="quantity" 
+            name="quantity" 
+            class="form-control" 
+            [(ngModel)]="newRequestForm.requested_quantity" 
+            min="1"
+            required
+          >
+        </div>
+        
+        <div class="form-group">
+          <label for="priority">Priorité</label>
+          <select 
+            id="priority" 
+            name="priority" 
+            class="form-control" 
+            [(ngModel)]="newRequestForm.priority"
+            required
+          >
+            @for (p of priorities; track p) {
+              <option [value]="p">{{ p }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="comment">Commentaire</label>
+          <textarea 
+            id="comment" 
+            name="comment" 
+            class="form-control" 
+            [(ngModel)]="newRequestForm.comment"
+          ></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="cancel-button" (click)="closeFormModal()">Annuler</button>
+          <button type="submit" class="submit-button">Créer</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>

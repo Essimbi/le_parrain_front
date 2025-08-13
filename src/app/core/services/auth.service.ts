@@ -17,7 +17,7 @@ export interface AuthState {
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://127.0.0.1:8000/api';
+  private apiUrl = 'https://le-parrain.mbotchakfoundation.org/api';
 
   private authStateSubject = new BehaviorSubject<AuthState>(this.getInitialAuthState());
   public authState$: Observable<AuthState> = this.authStateSubject.asObservable();
@@ -56,7 +56,7 @@ export class AuthService {
   login(credentials: LoginRequest): Observable<LoginResponse> {
     this.authStateSubject.next({ ...this.authStateSubject.value, loading: true, error: null });
 
-    return this.http.post<LoginResponse>(`${this.apiUrl}/login/`, credentials).pipe(
+    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, credentials).pipe(
       tap((response: LoginResponse) => {
         // Store token and user info
         localStorage.setItem('authToken', response.token);

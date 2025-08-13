@@ -1,186 +1,369 @@
+/* --- Variables de couleurs SCSS --- */
+$primary: #34495e;
+$primary-light: #eff3f6;
+$accent: #3498db;
+$accent-light: #e6f2fa;
+$success: #2ecc71;
+$success-light: #ecf9f1;
+$danger: #e74c3c;
+$danger-light: #fef0ef;
+$warning: #f39c12;
+$warning-light: #fff7e6;
+$grey: #95a5a6;
+$light-grey: #ecf0f1;
+$dark-grey: #2c3e50;
+$white: #ffffff;
+
+/* --- Général et Mise en page --- */
 .stock-bar-page {
-  padding: 2rem;
+  padding: 1.5rem;
   max-width: 1400px;
   margin: 0 auto;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
 }
 
 .page-header {
   margin-bottom: 2rem;
   padding: 1.5rem;
-  background: white;
+  background-color: $white;
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-  border-left: 5px solid #3498db;
+  border-left: 5px solid $accent;
 
   .title {
-    color: #2c3e50;
+    font-size: 1.75rem;
     font-weight: 700;
+    color: $primary;
+    margin-bottom: 0.5rem;
   }
 
   .subtitle {
-    color: #7f8c8d;
+    font-size: 1rem;
+    color: $grey;
   }
 }
 
-.metric-card {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-  height: 100%;
-  display: flex;
-  flex-direction: column;
+/* --- Grille des métriques --- */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
 
+.metric-card {
+  background-color: $white;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  
   &:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
   }
 
   &.critical {
-    border-left: 4px solid #e74c3c;
-    
-    .heading {
-      color: #e74c3c;
-    }
+    background-color: $danger-light;
+    border-left: 4px solid $danger;
   }
 
-  .card-content {
-    padding: 1.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-grow: 1;
-
+  .content {
     .heading {
       font-size: 0.8rem;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      color: #95a5a6;
+      color: $grey;
       margin-bottom: 0.25rem;
     }
     
     .title {
-      font-weight: 700;
       font-size: 1.5rem;
+      font-weight: 700;
+      color: $primary;
       line-height: 1.2;
     }
 
     .subtitle {
       font-size: 0.75rem;
-      color: #bdc3c7;
+      color: $warning;
+      font-weight: 500;
     }
 
-    .icon-container {
-      font-size: 2rem;
+    &.critical .heading, &.critical .title, &.critical .subtitle {
+      color: $danger;
     }
+    
+    .value-success { color: $success; }
+    .value-info { color: $accent; }
+    .value-danger { color: $danger; }
+  }
+
+  .icon-container {
+    font-size: 2.5rem;
+    line-height: 1;
+    color: $grey;
+    
+    &.accent { color: $accent; }
+    &.danger { color: $danger; }
+    &.success { color: $success; }
+    &.grey { color: $grey; }
   }
 }
 
-.stock-categories {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
-  margin-top: 2rem;
-}
-
-.category-card {
-  background: white;
+/* --- Conteneur du tableau et des contrôles --- */
+.stock-table-container {
+  background-color: $white;
+  padding: 1.5rem;
   border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-  overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  
-  &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.table-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  align-items: center;
+
+  .search-bar {
+    flex-grow: 1;
+    min-width: 200px;
+    padding: 0.75rem 1rem;
+    border: 1px solid $light-grey;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+    
+    &:focus {
+      outline: none;
+      border-color: $accent;
+    }
   }
 
-  .card-header {
+  .filter-select {
+    padding: 0.75rem 1rem;
+    border: 1px solid $light-grey;
+    border-radius: 8px;
+    background-color: $white;
+    font-size: 1rem;
+    color: $primary;
+    appearance: none;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2395a5a6%22%20d%3D%22M287%20165.7l-123.6-123.6c-4.7-4.7-12.3-4.7-17%200L5.4%20165.7c-4.7%204.7-4.7%2012.3%200%2017l14.3%2014.3c4.7%204.7%2012.3%204.7%2017%200l93.2-93.2c4.7-4.7%2012.3-4.7%2017%200l93.2%2093.2c4.7%204.7%2012.3%204.7%2017%200l14.3-14.3c4.7-4.7%204.7-12.3%200-17z%22%2F%3E%3C%2Fsvg%3E');
+    background-repeat: no-repeat;
+    background-position: right 0.7rem center;
+    background-size: 10px;
+    cursor: pointer;
+    
+    &:focus {
+      outline: none;
+      border-color: $accent;
+    }
+  }
+
+  .filter-checkbox-container {
     display: flex;
     align-items: center;
-    padding: 1rem 1.5rem;
-    color: white;
-    font-weight: 600;
-    font-size: 1.2rem;
-
-    .emoji {
-      font-size: 1.5rem;
-      margin-right: 0.75rem;
-    }
-  }
-
-  .card-content {
-    padding: 1rem;
-
-    .product-list {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-    }
-  }
-}
-
-.product-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.75rem 0.5rem;
-  border-bottom: 1px solid #ecf0f1;
-  
-  &:last-child {
-    border-bottom: none;
-  }
-  
-  .product-info {
-    display: flex;
-    flex-direction: column;
+    cursor: pointer;
+    user-select: none;
+    font-weight: 500;
     
-    .product-name {
-      font-weight: 500;
-      color: #34495e;
-    }
-    
-    .product-stock {
-      font-size: 0.8rem;
-      color: #95a5a6;
+    input[type="checkbox"] {
+      display: none;
       
-      &.low {
-        color: #e74c3c;
-        font-weight: 600;
+      &:checked + .checkmark {
+        background-color: $danger;
+        border-color: $danger;
+        
+        &::after {
+          display: block;
+        }
+      }
+    }
+    
+    .checkmark {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid $grey;
+      border-radius: 4px;
+      margin-right: 0.5rem;
+      position: relative;
+      background-color: $white;
+      transition: all 0.3s ease;
+      
+      &::after {
+        content: '';
+        position: absolute;
+        display: none;
+        left: 6px;
+        top: 2px;
+        width: 5px;
+        height: 10px;
+        border: solid white;
+        border-width: 0 3px 3px 0;
+        transform: rotate(45deg);
       }
     }
   }
+}
 
-  .actions {
-    display: flex;
-    align-items: center;
+/* --- Tableau des produits --- */
+.products-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
 
-    .button {
-      width: 28px;
-      height: 28px;
-      padding: 0;
-      border: 1px solid #bdc3c7;
-      background: #f8f9fa;
-      color: #34495e;
-      font-weight: 700;
-      font-size: 1rem;
-      line-height: 1;
-      border-radius: 50%;
-      cursor: pointer;
-      transition: background-color 0.2s, transform 0.2s;
+  th, td {
+    text-align: left;
+    padding: 1rem;
+    border-bottom: 1px solid $light-grey;
+  }
+
+  thead {
+    th {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      color: $grey;
+      font-weight: 600;
+      
+      &:first-child { border-top-left-radius: 8px; }
+      &:last-child { border-top-right-radius: 8px; }
+    }
+  }
+
+  tbody {
+    tr {
+      transition: background-color 0.3s ease;
       
       &:hover {
-        background-color: #ecf0f1;
-        transform: scale(1.05);
+        background-color: $primary-light;
       }
-      
-      &.is-small {
-        font-size: 0.8rem;
-      }
-      
-      &:first-child {
-        margin-right: 0.5rem;
-      }
+    }
+  }
+  
+  .status-cell {
+    span {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      line-height: 1;
+    }
+
+    &.status-in-stock span {
+      background-color: $success-light;
+      color: $success;
+    }
+    &.status-warning span {
+      background-color: $warning-light;
+      color: $warning;
+    }
+    &.status-low span {
+      background-color: $danger-light;
+      color: $danger;
+    }
+  }
+}
+
+/* --- Pagination --- */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+
+  .page-link {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    border: 1px solid $light-grey;
+    color: $primary;
+    background-color: $white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    
+    &:hover:not(.active) {
+      background-color: $primary-light;
+    }
+
+    &.active {
+      background-color: $accent;
+      border-color: $accent;
+      color: $white;
+      cursor: default;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+  }
+}
+
+/* --- Loader et état vide --- */
+.loader-overlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4rem 0;
+  
+  .loader {
+    border: 4px solid $light-grey;
+    border-top: 4px solid $accent;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 0;
+  color: $grey;
+  
+  .emoji {
+    font-size: 4rem;
+  }
+}
+
+/* --- Media Queries pour la responsivité --- */
+@media (max-width: 768px) {
+  .page-header {
+    padding: 1rem;
+    .title { font-size: 1.5rem; }
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .table-controls {
+    flex-direction: column;
+    align-items: stretch;
+
+    .search-bar, .filter-select {
+      width: 100%;
+    }
+  }
+  
+  .products-table {
+    font-size: 0.9rem;
+    
+    th, td {
+      padding: 0.75rem;
     }
   }
 }
